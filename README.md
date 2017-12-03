@@ -6,7 +6,7 @@ Un cliente descarga un video en 3 partes. Cada una de ella de un Servidor de Des
 
 Puede consultar el detalle de los requerimientos de la aplicación [aquí](./Enunciado.pdf)
 
-Esta implementación corresponde al proyecto final del Laboratorio del curso "Redes de Computadoras II" de la Universidad Simón Bolívar. 
+Esta implementación corresponde al proyecto final del Laboratorio del curso "Redes de Computadoras II" de la Universidad Simón Bolívar durante el trimestre Septiembre - Diciembre 2017. 
 
 ## Autores
 * Alejandra Cordero - [alejandra.corderogarcia21@gmail.com](mailto:alejandra.corderogarcia21@gmail.com)
