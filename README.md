@@ -8,6 +8,10 @@ Puede consultar el detalle de los requerimientos de la aplicación [aquí](./Enu
 
 Esta implementación corresponde al proyecto final del Laboratorio del curso "Redes de Computadoras II" de la Universidad Simón Bolívar. 
 
+## Autores
+* Alejandra Cordero - [alejandra.corderogarcia21@gmail.com](mailto:alejandra.corderogarcia21@gmail.com)
+* Pablo Maldonado - [prmm95@gmail.com](mailto:prmm95@gmail.com)
+
 ## Requerimientos de *software*
 
 - Python 3
