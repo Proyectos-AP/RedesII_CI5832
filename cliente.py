@@ -12,6 +12,12 @@
 '''
 
 #------------------------------------------------------------------------------#
+#                                   IMPORTES                                   #
+#------------------------------------------------------------------------------#
+
+import socket
+
+#------------------------------------------------------------------------------#
 #                                   NOTAS                                      #
 #------------------------------------------------------------------------------#
 
@@ -23,7 +29,7 @@
 #------------------------------------------------------------------------------#
 
 inscrito = False # Indica si el cliente está inscrito o no
-
+PORT = 9999
 #------------------------------------------------------------------------------#
 #                                   ERRORES                                    #
 #------------------------------------------------------------------------------#
@@ -40,10 +46,27 @@ def inscribir_cliente():
         Descripción:
     '''
     global inscrito
+    global PORT
 
     if not(inscrito): 
 
         # Se realizan la inscripcion del servidor
+
+        # Se crea el socket
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # Se obtiene el hostname de la maquina
+        host = socket.gethostname()
+        
+        # Conectamos el socket
+        client_socket.connect((host, PORT))
+
+        # Se espera el ACK
+        msg = client_socket.recv(1024)                                     
+
+        # Se cierra el socket
+        client_socket.close()
+        print (msg.decode('ascii'))
 
         # Se obtiene el resultado de la operacion
 
