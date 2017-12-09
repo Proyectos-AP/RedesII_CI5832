@@ -128,8 +128,10 @@ def escuchar_cliente():
     while True:
 
         # Se establece la conexion
-        clientsocket,addr = serversocket.accept()      
-        inscribir_cliente(addr)     
+        clientsocket,addr = serversocket.accept()    
+        data = clientsocket.recv(1024)
+        ip_port = pickle.loads(data)  
+        inscribir_cliente(ip_port)     
         msg = 'ACK'+ "\r\n"
         clientsocket.send(msg.encode('ascii'))
         clientsocket.close()
@@ -179,6 +181,7 @@ def escuchar_servidor_descarga():
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
-escuchar_servidor_descarga()
+#escuchar_servidor_descarga()
+escuchar_cliente()
 
 #------------------------------------------------------------------------------#

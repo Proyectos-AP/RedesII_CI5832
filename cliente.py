@@ -16,6 +16,8 @@
 #------------------------------------------------------------------------------#
 
 import socket
+import pickle 
+import re
 
 #------------------------------------------------------------------------------#
 #                                   NOTAS                                      #
@@ -41,7 +43,25 @@ error_ya_inscrito = "ERROR : El el cliente ya está inscrito" # es un error?
 #                           DEFINICIÓN DE FUNCIONES                            #
 #------------------------------------------------------------------------------#
 
-def inscribir_cliente():
+
+def verificar_puerto(port):
+
+    '''
+        Descripción:
+    '''
+
+    result = re.match("(6553[0-5]|655[0-2][0-9]\d|65[0-4](\d){2}|6[0-4](\d){3}|[1-5](\d){4}|[1-9](\d){0,3})",port)
+
+    if (result and result.group() == port ): 
+        return True
+
+    else:
+        return False
+
+
+#------------------------------------------------------------------------------#
+
+def inscribir_cliente(ip,port):
     '''
         Descripción:
     '''
@@ -59,7 +79,14 @@ def inscribir_cliente():
         host = socket.gethostname()
         
         # Conectamos el socket
-        client_socket.connect((host, PORT))
+        try:
+            client_socket.connect((host, PORT))
+        except:
+            print("No se pudo establecer una conexón con el servidor central.")
+        
+
+        data_string = pickle.dumps([ip,port])
+        client_socket.send(data_string)
 
         # Se espera el ACK
         msg = client_socket.recv(1024)                                     
@@ -129,15 +156,29 @@ while True:
     opcion = input("CL ---> ")
     argumento_recibido = ""
 
-    # Pensar como se haria para extraer el valor en inscribir
+    opcion = opcion.split(" ")
 
-    if opcion == "INSCRIBIR":
-        inscribir_cliente()
+    # Se extrae el valor del ip y el puerto
+    if opcion[0] == "INSCRIBIR":
 
-    elif opcion == "LISTA_VIDEOS":
+        # Se verifica si los parametros instroducidos son correctos
+        if (len(opcion) == 2):
+            ip_port = opcion[1].split(":")
+            # Se verifica si el número de puerto es correcto.
+
+            if (verificar_puerto(ip_port[1])):
+                inscribir_cliente(ip_port[0],ip_port[1])
+
+            else:
+                print("No se han intoducido un número de puerto correcto.")
+
+        else:
+            print("No se han intoducido los parametros de la inscripción correctamente.")
+
+    elif opcion[0] == "LISTA_VIDEOS":
         lista_videos()
 
-    elif opcion == "VIDEO":
+    elif opcion[0] == "VIDEO":
         video("Video_A_Descargar")
 
     else:
