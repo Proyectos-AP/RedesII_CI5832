@@ -76,11 +76,11 @@ def inscribir_cliente(ip,port):
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Se obtiene el hostname de la maquina
-        host = socket.gethostname()
+        #host = socket.gethostname()
         
         # Conectamos el socket
         try:
-            client_socket.connect((host, PORT))
+            client_socket.connect((ip, PORT))
         except:
             print("No se pudo establecer una conexón con el servidor central.")
         

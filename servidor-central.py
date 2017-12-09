@@ -102,6 +102,25 @@ def consola():
         else:
             print("ERROR : La opción no es válida. Intente de nuevo")
 
+
+#------------------------------------------------------------------------------#
+
+def get_ip():
+
+    '''
+        Descripción:
+    '''
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+
+    print(ip)
+
+    return ip 
+
+
 #------------------------------------------------------------------------------#
 
 def escuchar_cliente():
@@ -115,11 +134,11 @@ def escuchar_cliente():
                 socket.AF_INET, socket.SOCK_STREAM) 
 
 
-    # Se obtiene el hostname de la maquina
-    host = socket.gethostname()                           
+    # Se obtiene el ip de la maquina
+    server_ip = get_ip()
 
     # bind to the PORT_CLIENTE
-    serversocket.bind((host, PORT_CLIENTE))                                  
+    serversocket.bind((server_ip, PORT_CLIENTE))                                  
 
     # queue up to 5 requests
     serversocket.listen(5) 
