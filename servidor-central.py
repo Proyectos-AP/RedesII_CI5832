@@ -31,9 +31,10 @@ videos_disponibles = []
 servidores_descarga     = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
-MENSAJE_INSCRIPCION     = 1
-MENSAJE_MOSTRAR_VIDEO   = 2
-MENSAJE_DESCARGA_VIDEO  = 3    
+MENSAJE_INSCRIPCION     = 21
+MENSAJE_MOSTRAR_VIDEO   = 22
+MENSAJE_DESCARGA_VIDEO  = 23
+MENSAJE_INSCRIPCION_SD  = 11
 
 #------------------------------------------------------------------------------#
 #                           DEFINICIÓN DE FUNCIONES                            #
@@ -211,20 +212,28 @@ def escuchar_servidor_descarga():
     print("---- Se abrió socket para escuchar a Servidor de Descarga -----")
     while True:
 
+        enviar_ack = False
+
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()
 
         # Se recibe la información enviada por los SD.      
         data = clientsocket.recv(4096)
-        videos_disponibles = pickle.loads(data)
+        mensaje = pickle.loads(data)
 
-        # Se almacena la información recibida
-        inscribir_sd(addr,videos_disponibles)
 
-        # Se envia el ACK
-        msg = 'ACK'+ "\r\n"
-        clientsocket.send(msg.encode('ascii'))
-        clientsocket.close()
+        if (mensaje.id  == MENSAJE_INSCRIPCION_SD):
+            # Se almacena la información recibida
+            inscribir_sd([mensaje.ip,mensaje.port],mensaje.videos)
+            enviar_ack = True
+
+
+        # Se envia un mensaje ACK al cliente.
+        if (enviar_ack):
+            ack = Mensaje_ack(mensaje.id)
+            data_string = pickle.dumps(mensaje)
+            clientsocket.send(data_string)
+            clientsocket.close()
 
 
 #------------------------------------------------------------------------------#

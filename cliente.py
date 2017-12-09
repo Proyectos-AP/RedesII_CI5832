@@ -34,7 +34,7 @@ import re
 inscrito = False # Indica si el cliente está inscrito o no
 PORT = 9999
 IP = 0
-MENSAJE_LISTA_VIDEOS = 4
+MENSAJE_LISTA_VIDEOS = 34
 
 #------------------------------------------------------------------------------#
 #                                   ERRORES                                    #
@@ -111,7 +111,7 @@ def inscribir_cliente(ip,port):
             print("El cliente se ha inscrito de forma satisfactoria")
 
         else:
-            print("El cliente se ha podido inscribir. Intentelo de nuevo.")
+            print("El cliente no se ha podido inscribir. Intentelo de nuevo.")
 
     else: 
         print(error_ya_inscrito)
