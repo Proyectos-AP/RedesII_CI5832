@@ -28,11 +28,14 @@ import re
 #   aqui es que si aja solo dos veces, pero es mas tipo #elanalisis
 
 #------------------------------------------------------------------------------#
-#                              VARIABLES DE ESTADO                             #
+#                              VARIABLES GLOBALES                              #
 #------------------------------------------------------------------------------#
 
 inscrito = False # Indica si el cliente está inscrito o no
 PORT = 9999
+IP = 0
+MENSAJE_LISTA_VIDEOS = 4
+
 #------------------------------------------------------------------------------#
 #                                   ERRORES                                    #
 #------------------------------------------------------------------------------#
@@ -68,6 +71,7 @@ def inscribir_cliente(ip,port):
     '''
     global inscrito
     global PORT
+    global IP
 
     if not(inscrito): 
 
@@ -103,6 +107,7 @@ def inscribir_cliente(ip,port):
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id):
             inscrito = True
+            IP = ip
             print("El cliente se ha inscrito de forma satisfactoria")
 
         else:
@@ -121,22 +126,46 @@ def lista_videos():
         print(error_no_inscrito)
 
     else:
-        # Se hace la consulta de los videos 
-        # disponibles
+        # Se hace la consulta de los videos disponibles
 
-        # Se recibe la informacion
-        videos_disponibles = [
-            "La_Divaza_En_Mexico",
-            "How_To_Flirt",
-            "Frozen_iPhone",
-            "Tove_Lo_Habits",
-        ]
+        # Se crea el socket
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        # Conectamos el socket
+        try:
+            client_socket.connect((IP, PORT))
+        except:
+            print("No se pudo establecer una conexón con el servidor central.")
+        
 
-        # Se muestran los videos disponibles
-        print("Los videos disponibles del servidor son:")
+        # Se arma el mensaje que va a ser enviado al servidor.
+        mensaje = Mensaje_mostrar_videos()
+        data_string = pickle.dumps(mensaje)
+        client_socket.send(data_string)
 
-        for i in range(0,len(videos_disponibles)):
-            print("- " + videos_disponibles[i])
+        # Se espera la respuesta del servidor central
+        mensaje_videos = client_socket.recv(1024)                                     
+
+        # Se cierra el socket
+        client_socket.close()
+
+        # Se lee el ACK
+        mensaje_videos = pickle.loads(mensaje_videos)
+
+        # Se verifica si el mensaje es correcto.
+        if (mensaje_videos.id == MENSAJE_LISTA_VIDEOS):
+
+            # Se muestran los videos disponibles
+            print("Los videos disponibles del servidor son:")
+
+            for i in range(0,len(mensaje_videos.videos)):
+                print("- " + mensaje_videos.videos[i])
+
+        else:
+            print("El servidor no ha podido enviar los vídeos disponibles. Intentelo de nuevo.")
+
+
+
 
 #------------------------------------------------------------------------------#
 

@@ -27,16 +27,17 @@ class Mensaje_inscripcion:
 
 class Mensaje_mostrar_videos:
 
-	def __init__(self,ip,port):
+	def __init__(self):
 		self.id = 2
 		self.type = "cliente-sevidor"
 
 #------------------------------------------------------------------------------#
 
 class Mensaje_descarga_videos:
-	def __init__(self,ip,port):
-		self.id = 3
-		self.type = "cliente-sevidor"
+	def __init__(self,video):
+		self.id    = 3
+		self.video = video
+		self.type  = "cliente-sevidor"
 
 #------------------------------------------------------------------------------#
 

@@ -24,7 +24,13 @@ import pickle
 #------------------------------------------------------------------------------#
 
 clientes                = {}
-videos_disponibles      = []
+
+videos_disponibles = [
+    "How_To_Flirt",
+    "Frozen_iPhone",
+    "Tove_Lo_Habits",
+]
+
 servidores_descarga     = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
@@ -151,6 +157,8 @@ def escuchar_cliente():
     print("---- SERVIDOR CENTRAL -----")
     while True:
 
+        enviar_ack = False
+
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()    
         data = clientsocket.recv(1024)
@@ -158,18 +166,28 @@ def escuchar_cliente():
 
         if (mensaje.id == MENSAJE_INSCRIPCION):
             inscribir_cliente([mensaje.ip,mensaje.port])
+            enviar_ack = True
 
         elif (mensaje.id == MENSAJE_MOSTRAR_VIDEO):
-            videos_cliente()
+            
+            print("Se está enviando la lista de vídeos disponibles al cliente...")
+            videos = Mensaje_lista_videos(videos_disponibles)
+            data_string = pickle.dumps(videos)
+            clientsocket.send(data_string)
+            clientsocket.close()
+            enviar_ack = False
 
         elif (mensaje.id == MENSAJE_DESCARGA_VIDEO):
             print("INFORMAR AL SERVIDOR DE DESCARGA")
+            enviar_ack = True
+
 
         # Se envia un mensaje ACK al cliente.
-        ack = Mensaje_ack(mensaje.id)
-        data_string = pickle.dumps(mensaje)
-        clientsocket.send(data_string)
-        clientsocket.close()
+        if (enviar_ack):
+            ack = Mensaje_ack(mensaje.id)
+            data_string = pickle.dumps(mensaje)
+            clientsocket.send(data_string)
+            clientsocket.close()
 
 #------------------------------------------------------------------------------#
 
