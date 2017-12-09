@@ -19,6 +19,7 @@
 
 import socket
 import pickle 
+import _thread
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
@@ -51,6 +52,22 @@ def iniciar_servidor():
 
 #------------------------------------------------------------------------------#
 
+def get_ip():
+
+    '''
+        Descripción:
+    '''
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+
+    return ip 
+
+
+#------------------------------------------------------------------------------#
+
 def inscribir_servidor_descarga():
     '''
         Descripción:
@@ -60,10 +77,10 @@ def inscribir_servidor_descarga():
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Se obtiene el hostname de la maquina
-    host = socket.gethostname()
+    ip = get_ip()
     
     # Conectamos el socket
-    sd_socket.connect((host, PORT))
+    sd_socket.connect((ip, PORT))
 
     data_string = pickle.dumps(videos_disponibles)
     sd_socket.send(data_string)
@@ -78,7 +95,7 @@ def inscribir_servidor_descarga():
     # Se obtiene el resultado de la operacion
 
     inscrito = True
-    print("El servidor se ha inscrito de forma satisfactoria")
+    print("El servidor se ha inscrito de forma satisfactoria.")
 
     pass
 #------------------------------------------------------------------------------#
@@ -103,7 +120,7 @@ def consola():
     print("---- SERVIDOR DESCARGA -----")
 
     # Primero, inicializa el servidor
-    iniciar_servidor()
+    #iniciar_servidor()
 
     # Luego de esto, se presenta el menu de opciones
     while True:
@@ -122,6 +139,11 @@ def consola():
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
-iniciar_servidor()
+# Se abre hilo para el inicio de sesión del servidor de descarga
+_thread.start_new_thread(iniciar_servidor,())
+
+# Se abre la consola
+consola()
+
 
 #------------------------------------------------------------------------------#

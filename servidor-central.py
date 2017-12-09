@@ -15,6 +15,7 @@
 #                                   IMPORTES                                   #
 #------------------------------------------------------------------------------#
 
+import _thread
 from mensajes_cli_sc import *
 import socket
 import pickle 
@@ -25,11 +26,7 @@ import pickle
 
 clientes                = {}
 
-videos_disponibles = [
-    "How_To_Flirt",
-    "Frozen_iPhone",
-    "Tove_Lo_Habits",
-]
+videos_disponibles = []
 
 servidores_descarga     = {}
 PORT_CLIENTE            = 9999
@@ -87,8 +84,10 @@ def inscribir_sd(addr,videos):
     '''
 
     global servidores_descarga
+    global videos_disponibles
 
     servidores_descarga[addr[0],addr[1]] = videos
+    videos_disponibles = videos_disponibles + videos
 
     print("Se ha inscrito el Servidor de descarga",servidores_descarga)
 
@@ -127,8 +126,6 @@ def get_ip():
     ip = s.getsockname()[0]
     s.close()
 
-    print(ip)
-
     return ip 
 
 
@@ -154,7 +151,7 @@ def escuchar_cliente():
     # queue up to 5 requests
     serversocket.listen(5) 
 
-    print("---- SERVIDOR CENTRAL -----")
+    print("---- Se abrió socket para escuchar al cliente -----")
     while True:
 
         enviar_ack = False
@@ -202,16 +199,16 @@ def escuchar_servidor_descarga():
                 socket.AF_INET, socket.SOCK_STREAM) 
 
 
-    # Se obtiene el hostname de la maquina
-    host = socket.gethostname()                           
+    # Se obtiene el ip de la maquina
+    server_ip = get_ip()                          
 
     # bind to the PORT_CLIENTE
-    serversocket.bind((host, PORT_SERVIDOR_DESCARGA))                                  
+    serversocket.bind((server_ip, PORT_SERVIDOR_DESCARGA))                                  
 
     # queue up to 5 requests
     serversocket.listen(5) 
 
-    print("---- SERVIDOR CENTRAL -----")
+    print("---- Se abrió socket para escuchar a Servidor de Descarga -----")
     while True:
 
         # Se establece la conexion
@@ -234,7 +231,14 @@ def escuchar_servidor_descarga():
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
-#escuchar_servidor_descarga()
-escuchar_cliente()
+# Se abre el hilo que se encargará de escuchar al servidor de descarga
+_thread.start_new_thread(escuchar_servidor_descarga,())
+
+# Se abre el hilo que se encargará de escuchar al cliente
+_thread.start_new_thread(escuchar_cliente,())
+
+# Se muestra la consola
+consola()
+
 
 #------------------------------------------------------------------------------#
