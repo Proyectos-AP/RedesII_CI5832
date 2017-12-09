@@ -15,6 +15,7 @@
 #                                   IMPORTES                                   #
 #------------------------------------------------------------------------------#
 
+from mensajes_cli_sc import *
 import socket
 import pickle 
 import re
@@ -85,7 +86,9 @@ def inscribir_cliente(ip,port):
             print("No se pudo establecer una conexón con el servidor central.")
         
 
-        data_string = pickle.dumps([ip,port])
+        # Se arma el mensaje que va a ser enviado al servidor.
+        mensaje = Mensaje_inscripcion(ip,port)
+        data_string = pickle.dumps(mensaje)
         client_socket.send(data_string)
 
         # Se espera el ACK
@@ -93,12 +96,18 @@ def inscribir_cliente(ip,port):
 
         # Se cierra el socket
         client_socket.close()
-        print (msg.decode('ascii'))
 
-        # Se obtiene el resultado de la operacion
+        # Se lee el ACK
+        ack = pickle.loads(msg)
 
-        inscrito = True
-        print("El cliente se ha inscrito de forma satisfactoria")
+        # Se verifica si el ACK es correcto.
+        if (ack.id == mensaje.id):
+            inscrito = True
+            print("El cliente se ha inscrito de forma satisfactoria")
+
+        else:
+            print("El cliente se ha podido inscribir. Intentelo de nuevo.")
+
     else: 
         print(error_ya_inscrito)
 

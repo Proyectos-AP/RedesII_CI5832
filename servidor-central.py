@@ -15,6 +15,7 @@
 #                                   IMPORTES                                   #
 #------------------------------------------------------------------------------#
 
+from mensajes_cli_sc import *
 import socket
 import pickle 
 
@@ -22,10 +23,14 @@ import pickle
 #                            VARIABLES GLOBALES                                #
 #------------------------------------------------------------------------------#
 
-clientes               = {}
-servidores_descarga    = {}
-PORT_CLIENTE           = 9999
-PORT_SERVIDOR_DESCARGA = 9998      
+clientes                = {}
+videos_disponibles      = []
+servidores_descarga     = {}
+PORT_CLIENTE            = 9999
+PORT_SERVIDOR_DESCARGA  = 9998 
+MENSAJE_INSCRIPCION     = 1
+MENSAJE_MOSTRAR_VIDEO   = 2
+MENSAJE_DESCARGA_VIDEO  = 3    
 
 #------------------------------------------------------------------------------#
 #                           DEFINICIÓN DE FUNCIONES                            #
@@ -149,10 +154,21 @@ def escuchar_cliente():
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()    
         data = clientsocket.recv(1024)
-        ip_port = pickle.loads(data)  
-        inscribir_cliente(ip_port)     
-        msg = 'ACK'+ "\r\n"
-        clientsocket.send(msg.encode('ascii'))
+        mensaje = pickle.loads(data)
+
+        if (mensaje.id == MENSAJE_INSCRIPCION):
+            inscribir_cliente([mensaje.ip,mensaje.port])
+
+        elif (mensaje.id == MENSAJE_MOSTRAR_VIDEO):
+            videos_cliente()
+
+        elif (mensaje.id == MENSAJE_DESCARGA_VIDEO):
+            print("INFORMAR AL SERVIDOR DE DESCARGA")
+
+        # Se envia un mensaje ACK al cliente.
+        ack = Mensaje_ack(mensaje.id)
+        data_string = pickle.dumps(mensaje)
+        clientsocket.send(data_string)
         clientsocket.close()
 
 #------------------------------------------------------------------------------#
