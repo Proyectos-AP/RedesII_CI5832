@@ -28,7 +28,7 @@ import random
 #------------------------------------------------------------------------------#
 
 
-IP_SERVIDOR          = "192.168.0.106"
+IP_SERVIDOR          = "192.168.1.7"
 
 # Puerto para enviar info al Servidor Central
 PORT_ENVIO_SC          = 9998
