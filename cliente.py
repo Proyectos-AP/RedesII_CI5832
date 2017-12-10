@@ -159,8 +159,8 @@ def lista_videos():
             # Se muestran los videos disponibles
             print("Los videos disponibles del servidor son:")
 
-            for i in range(0,len(mensaje_videos.videos)):
-                print("- " + mensaje_videos.videos[i])
+            for video in mensaje_videos.videos:
+                print("- " + video)
 
         else:
             print("El servidor no ha podido enviar los vídeos disponibles. Intentelo de nuevo.")

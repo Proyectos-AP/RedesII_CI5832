@@ -25,7 +25,7 @@ import pickle
 #------------------------------------------------------------------------------#
 
 clientes                = {}
-videos_disponibles      = []
+videos_disponibles      = set()
 servidores_descarga     = {}
 videos_atendidos        = {}
 PORT_CLIENTE            = 9999
@@ -155,8 +155,9 @@ def inscribir_sd(addr,videos):
     global videos_disponibles
 
     servidores_descarga[addr[0],addr[1]] = videos
-    videos_disponibles = videos_disponibles + videos
+    videos_disponibles = videos_disponibles.union(set(videos))
 
+    print("VIDEOS DISPONIBLES",videos_disponibles)
     print("Se ha inscrito el Servidor de descarga",servidores_descarga)
 
 #------------------------------------------------------------------------------#
