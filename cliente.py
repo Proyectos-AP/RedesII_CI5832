@@ -69,7 +69,41 @@ def verificar_puerto(port):
 
 #------------------------------------------------------------------------------#
 
+def enviar_info(ip,port,mensaje):
+
+    '''
+        Descripción:
+    '''
+
+    # Se crea el socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+    # Conectamos el socket
+    try:
+        client_socket.connect((ip, port))
+    except:
+        print("No se pudo establecer una conexón con el servidor central.")
+        
+
+    # Se arma el mensaje que va a ser enviado al servidor.
+    data_string = pickle.dumps(mensaje)
+    client_socket.send(data_string)
+
+    # Se espera la respuesta del servidor central
+    mensaje_videos = client_socket.recv(1024)                                     
+
+    # Se cierra el socket
+    client_socket.close()
+
+    # Se lee el mensaje
+    mensaje_retorno = pickle.loads(mensaje_videos)
+
+    return mensaje_retorno
+
+#------------------------------------------------------------------------------#
+
 def inscribir_cliente(ip,port):
+
     '''
         Descripción:
     '''
@@ -83,35 +117,11 @@ def inscribir_cliente(ip,port):
         # Se realizan la inscripcion del servidor
 
         PORT_ESCUCHA = int(port)
-        # Se crea el socket
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # Se obtiene el hostname de la maquina
-        #host = socket.gethostname()
-        
-        # Conectamos el socket
-        try:
-            client_socket.connect((ip, PORT))
-        except:
-            print("No se pudo establecer una conexón con el servidor central.")
-        
-
-        # Se arma el mensaje que va a ser enviado al servidor.
         mensaje = Mensaje_inscripcion(ip,port)
-        data_string = pickle.dumps(mensaje)
-        client_socket.send(data_string)
 
-        # Se espera el ACK
-        msg = client_socket.recv(4096)                                     
-
-        # Se cierra el socket
-        client_socket.close()
-
-        # Se lee el ACK
-        ack = pickle.loads(msg)
-
-        print("ACK",ack.id,ack.type)
-
+        # Se envía mensaje al Servidor Central
+        ack = enviar_info(ip,PORT,mensaje)
 
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id and ack.type == "ack"):
@@ -139,29 +149,9 @@ def lista_videos():
         global videos_disponibles
         # Se hace la consulta de los videos disponibles
 
-        # Se crea el socket
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
-        # Conectamos el socket
-        try:
-            client_socket.connect((IP, PORT))
-        except:
-            print("No se pudo establecer una conexón con el servidor central.")
-        
-
-        # Se arma el mensaje que va a ser enviado al servidor.
         mensaje = Mensaje_mostrar_videos()
-        data_string = pickle.dumps(mensaje)
-        client_socket.send(data_string)
-
-        # Se espera la respuesta del servidor central
-        mensaje_videos = client_socket.recv(1024)                                     
-
-        # Se cierra el socket
-        client_socket.close()
-
-        # Se lee el ACK
-        mensaje_videos = pickle.loads(mensaje_videos)
+        # Se envía mensaje al Servidor Central
+        mensaje_videos = enviar_info(IP,PORT,mensaje)
 
         # Se verifica si el mensaje es correcto.
         if (mensaje_videos.id == MENSAJE_LISTA_VIDEOS):
@@ -186,28 +176,11 @@ def video(nombre_video):
         print(error_no_inscrito)
     else:
 
-        # Se crea el socket
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        # Conectamos el socket
-        try:
-            client_socket.connect((IP, PORT))
-        except:
-            print("No se pudo establecer una conexón con el servidor central.")
-
         # Se arma el mensaje que va a ser enviado al servidor.
         mensaje = Mensaje_descarga_videos(IP,PORT_ESCUCHA,nombre_video)
-        data_string = pickle.dumps(mensaje)
-        client_socket.send(data_string)
 
-        # Se espera el ACK
-        msg = client_socket.recv(1024)                                     
-
-        # Se cierra el socket
-        client_socket.close()
-
-        # Se lee el ACK
-        ack = pickle.loads(msg)
+        # Se envía mensaje al Servidor Central
+        ack = enviar_info(IP,PORT,mensaje)
 
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id and ack.type == "ack"):
@@ -274,6 +247,7 @@ def escuchar_servidor_descarga():
             clientsocket.send(data_string)
             clientsocket.close()
 
+    print("Se recibió el vídeo completo")
 
 
 #------------------------------------------------------------------------------#
