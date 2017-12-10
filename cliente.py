@@ -38,7 +38,7 @@ videos_disponibles   = []
 PORT                 = 9999
 PORT_ESCUCHA         = 0
 IP                   = 0
-IP_SERVIDOR          = "192.168.1.7"
+IP_SERVIDOR          = "192.168.0.106"
 MENSAJE_ENVIAR_VIDEO = 12
 MENSAJE_LISTA_VIDEOS = 34
 
