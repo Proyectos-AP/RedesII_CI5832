@@ -1,8 +1,27 @@
-from pony.orm import *
+'''
+    Archivo: modelo-db.py
 
+    Descripción: Define las entidades y las relaciones de la Base de Datos
+    del sistema.
+
+    Autores:
+        - Alejandra Cordero / 12-10645
+        - Pablo Maldonado / 12-10561
+
+    Última modificación: 11/12/2017
+'''
+
+#------------------------------------------------------------------------------#
+#                                   IMPORTES                                   #
+#------------------------------------------------------------------------------#
+
+from pony.orm import *
 
 db = Database()
 
+#------------------------------------------------------------------------------#
+#                            DEFINICIÓN DEL MODELO                             #
+#------------------------------------------------------------------------------#
 
 class Video(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -12,11 +31,13 @@ class Video(db.Entity):
     solicitud_descargas = Set('SolicitudDescarga')
     estado_servidor_descargas = Set('EstadoServidorDescarga')
 
+#------------------------------------------------------------------------------#
 
 class SolicitudDescarga(db.Entity):
     id = PrimaryKey(int, auto=True)
     video = Required(Video)
 
+#------------------------------------------------------------------------------#
 
 class ServidorDescarga(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -25,6 +46,7 @@ class ServidorDescarga(db.Entity):
     estado = Optional(str)
     videos = Set(Video)
 
+#------------------------------------------------------------------------------#
 
 class Cliente(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -33,11 +55,13 @@ class Cliente(db.Entity):
     descargas = Set('Descarga')
     estado_servidor_descargas = Set('EstadoServidorDescarga')
 
+#------------------------------------------------------------------------------#
 
 class Descarga(db.Entity):
     id = PrimaryKey(int, auto=True)
     cliente = Required(Cliente)
 
+#------------------------------------------------------------------------------#
 
 class EstadoServidorDescarga(db.Entity):
     id = PrimaryKey(int, auto=True)
@@ -45,6 +69,16 @@ class EstadoServidorDescarga(db.Entity):
     clientes = Set(Cliente)
     videos = Set(Video)
 
+#------------------------------------------------------------------------------#
+#                        INICIO DEL CÓDIGO PRINCIPAL                           #
+#------------------------------------------------------------------------------#
 
 
-db.generate_mapping()
+
+db.bind(provider='postgres', 
+        user='sistemavideo', 
+        password='123123', 
+        host='localhost', 
+        database='servidorcentral')
+
+db.generate_mapping(create_tables=True)

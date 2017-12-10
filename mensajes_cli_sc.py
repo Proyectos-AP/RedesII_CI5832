@@ -1,14 +1,14 @@
 '''
     Archivo: mensajes_cli_sc.py
 
-    Descripción: Provee los métodos de la interfaz por cónsola del servidor
-    central del servicio de descarga de videos.
+    Descripción: Define los mensajes que son intercambiados durante
+    la comunicación entre los distintos actores.
 
     Autores:
         - Alejandra Cordero / 12-10645
         - Pablo Maldonado / 12-10561
 
-    Última modificación: 
+    Última modificación: 11/12/2017
 '''
 
 #------------------------------------------------------------------------------#
@@ -16,7 +16,9 @@
 #------------------------------------------------------------------------------#
 
 class Mensaje_inscripcion:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self,ip,port):
 		self.id = 21
 		self.ip = ip
@@ -26,7 +28,9 @@ class Mensaje_inscripcion:
 #------------------------------------------------------------------------------#
 
 class Mensaje_mostrar_videos:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self):
 		self.id = 22
 		self.type = "cliente-sevidor"
@@ -34,6 +38,9 @@ class Mensaje_mostrar_videos:
 #------------------------------------------------------------------------------#
 
 class Mensaje_descarga_videos:
+	'''
+		Descripción:
+	'''
 	def __init__(self,ip,port,video):
 		self.id    = 23
 		self.ip    = ip
@@ -44,7 +51,9 @@ class Mensaje_descarga_videos:
 #------------------------------------------------------------------------------#
 
 class Mensaje_ack:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self,id,type,message=""):
 		self.id     = id
 		self.type   = type
@@ -53,7 +62,9 @@ class Mensaje_ack:
 #------------------------------------------------------------------------------#
 
 class Mensaje_lista_videos:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self,videos):
 		self.id = 34
 		self.videos = videos
@@ -64,7 +75,9 @@ class Mensaje_lista_videos:
 #------------------------------------------------------------------------------#
 
 class Mensaje_inscripcion_SD:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self,ip,port,videos):
 		self.id      = 11
 		self.ip      = ip
@@ -87,7 +100,9 @@ class Mensaje_video_atendido:
 #------------------------------------------------------------------------------#
 
 class Mensaje_atender_video:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self,ip,port,video,parte):
 		self.id             = 32
 		self.ip_cliente     = ip
@@ -101,7 +116,9 @@ class Mensaje_atender_video:
 #------------------------------------------------------------------------------#
 
 class Mensaje_enviar_video:
-
+	'''
+		Descripción:
+	'''
 	def __init__(self,ip,port,video,parte):
 		self.id             = 12
 		self.ip             = ip

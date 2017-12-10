@@ -8,7 +8,7 @@
         - Alejandra Cordero / 12-10645
         - Pablo Maldonado / 12-10561
 
-    Última modificación: 
+    Última modificación: 11/12/2017
 '''
 
 #------------------------------------------------------------------------------#
