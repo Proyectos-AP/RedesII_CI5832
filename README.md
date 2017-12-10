@@ -35,6 +35,13 @@ Cree el usuario y la base de datos del Servidor Central
 CREATE USER sistemavideo WITH PASSWORD '123123';
 CREATE DATABASE servidorcentral WITH OWNER sistemavideo;
 ```
+Cree las bases de datos de los Servidores de Descarga
+``` psql
+CREATE DATABASE servidordescarga1 WITH OWNER sistemavideo;
+CREATE DATABASE servidordescarga2 WITH OWNER sistemavideo;
+CREATE DATABASE servidordescarga3 WITH OWNER sistemavideo;
+```
+
 Salir del usuario *postgres*
 
 Ejecute el archivo que define el modelo:
