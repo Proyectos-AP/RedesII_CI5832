@@ -21,6 +21,26 @@ Esta implementación corresponde al proyecto final del Laboratorio del curso "Re
 ``` bash
 pip3 install -r requirements.txt
 ```
+# Base de Datos
+
+En primer lugar, será necesario crear la base de datos en *postgres* y el usuario correspondiente. Para ello, ejecute los siguientes comandos:
+
+Ingrese a *PostgreSQL*
+``` bash
+sudo -su postgres
+psql
+```
+Cree el usuario y la base de datos del Servidor Central
+``` psql
+CREATE USER sistemavideo WITH PASSWORD '123123';
+CREATE DATABASE servidorcentral WITH OWNER sistemavideo;
+```
+Salir del usuario *postgres*
+
+Ejecute el archivo que define el modelo:
+``` bash
+python3 modelo-db.py
+```
 
 ## Ejecución 
 
