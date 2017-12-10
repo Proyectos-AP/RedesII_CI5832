@@ -27,6 +27,9 @@ import random
 #                            VARIABLES GLOBALES                                #
 #------------------------------------------------------------------------------#
 
+
+IP_SERVIDOR          = "192.168.0.106"
+
 # Puerto para enviar info al Servidor Central
 PORT_ENVIO_SC          = 9998
 
@@ -98,7 +101,7 @@ def inscribir_servidor_descarga():
     
     try:
         # Conectamos el socket
-        sd_socket.connect((ip, PORT_ENVIO_SC))
+        sd_socket.connect((IP_SERVIDOR, PORT_ENVIO_SC))
     except:
         print("No se pudo establecer conexión con el Servidor Centra")
         exit(0)
@@ -140,11 +143,8 @@ def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     
-    # Se obtiene el ip de la maquina
-    ip_sd = get_ip()
-
     try:
-        sd_socket.connect((ip_sd,port_cliente))
+        sd_socket.connect((ip_cliente,port_cliente))
     except:
         print("No se pudo establecer una conexón.")
         exit(0)
@@ -182,7 +182,7 @@ def atender_cliente(ip,port,video,parte):
     ip_sd = get_ip()
 
     # Armo el mensaje que va a ser enviado al cliente.
-    mensaje = Mensaje_enviar_video(ip_sd,port,video,parte)
+    mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video,parte)
 
     # Envio el mensaje al cliente.
     mensaje_respuesta = enviar_video_cliente(ip,port,mensaje)

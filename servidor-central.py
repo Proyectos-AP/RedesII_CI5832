@@ -103,13 +103,10 @@ def asignar_video_sd(ip_sd,port_sd,ip_cliente,port_cliente,video,parte):
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Se obtiene el ip de la maquina
-    server_ip = get_ip()
     
     # Conectamos el socket
     try:
-        sd_socket.connect((server_ip,port_sd))
+        sd_socket.connect((ip_sd,port_sd))
     except:
         print("No se pudo establecer una conexón con el servidor descarga.")
     
