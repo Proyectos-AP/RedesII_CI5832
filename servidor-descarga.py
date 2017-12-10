@@ -54,7 +54,7 @@ def iniciar_servidor():
     global PORT_ESCUCHA_SC
 
     PORT_ESCUCHA_SC = random.randint(10000, 20000)
-    
+
     # Se comunica con el servidor central.
     inscribir_servidor_descarga()
 
@@ -167,9 +167,16 @@ def atender_cliente(ip,port,video,parte):
     # Envio el mensaje al cliente.
     mensaje_respuesta = enviar_video_cliente(ip,port,mensaje)
 
-    # Se verifica si el ACK es correcto.
+    # Se recibe un ACK del cliente y se verifica si el mismo es correcto.
     if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
         print("Se envio una parte del vídeo al cliente...")
+
+        # Se ĺe informa al servidor que el vídeo ya fué enviado
+        ip,port,video,parte
+        mensaje = Mensaje_video_atendido(ip,port,video,parte)
+        ack = enviar_video_cliente(ip,PORT_ENVIO_SC,mensaje)
+
+        print("Se recibió ACK del SC",ack)
 
 #------------------------------------------------------------------------------#
 
@@ -208,10 +215,11 @@ def escuchar_sc():
 
         if (mensaje.id == MENSAJE_ATENDER_VIDEO):
 
-            atender_cliente(mensaje.ip_cliente,mensaje.port_cliente,
-                            mensaje.video,mensaje.parte)
-            enviar_ack = True
+            # Se crea un hilo para que se atienda la solicitud del cliente
+            _thread.start_new_thread(atender_cliente,(mensaje.ip_cliente,
+                                    mensaje.port_cliente,mensaje.video,mensaje.parte,))
 
+            enviar_ack = True
 
         # Se envia un mensaje ACK al Servidor Central.
         if (enviar_ack):

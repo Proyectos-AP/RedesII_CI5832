@@ -74,6 +74,18 @@ class Mensaje_inscripcion_SD:
 
 #------------------------------------------------------------------------------#
 
+class Mensaje_video_atendido:
+
+	def __init__(self,ip,port,video,parte):
+		self.id             = 13
+		self.ip_cliente     = ip
+		self.port_cliente   = port
+		self.video          = video
+		self.parte          = parte
+		self.type           = "sevidorD-sevidorC"
+
+#------------------------------------------------------------------------------#
+
 class Mensaje_atender_video:
 
 	def __init__(self,ip,port,video,parte):

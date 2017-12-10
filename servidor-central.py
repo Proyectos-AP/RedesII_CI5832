@@ -27,6 +27,7 @@ import pickle
 clientes                = {}
 videos_disponibles      = []
 servidores_descarga     = {}
+videos_atendidos        = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
 MENSAJE_INSCRIPCION     = 21
@@ -34,6 +35,7 @@ MENSAJE_MOSTRAR_VIDEO   = 22
 MENSAJE_DESCARGA_VIDEO  = 23
 MENSAJE_INSCRIPCION_SD  = 11
 MENSAJE_ATENDER_VIDEO   = 32
+MENSAJE_VIDEO_ATENDIDO  = 13
 
 #------------------------------------------------------------------------------#
 #                           DEFINICIÓN DE FUNCIONES                            #
@@ -51,7 +53,19 @@ def numero_descargas_video():
     '''
         Descripción:
     '''
-    print("numero_descargas_video")
+    print("El número de descargas realizadas es:",len(videos_atendidos))
+
+#------------------------------------------------------------------------------#
+
+def videos_cliente():
+
+    '''
+        Descripción:
+    '''
+
+    print("Los vídeos atendidos son:")
+    print(videos_atendidos)
+
 
 #------------------------------------------------------------------------------#
 
@@ -61,20 +75,22 @@ def enviar_video_cliente(ip,port,video):
         Descripción:
     '''
 
-    parte_video = 0
+    parte_video = 1
 
     for server in servidores_descarga:
 
         mensaje_recibido, sd_socket = asignar_video_sd(server[0],server[1],ip,port,video,parte_video)
 
         # Se recibe el ACK del Servidor de Descarga.
+        print("Mensaje recibido",mensaje_recibido.id,mensaje_recibido.type)
+
         if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
 
             # Se espera a que el SD evíe el vídeo al cliente y envíe 
             # su confirmación
             #msg = sd_socket.recv(1024)
-            print("Recibido ACK del SD") 
-
+            print("Recibido ACK del SD")
+            parte_video += 1
 
 
 #------------------------------------------------------------------------------#
@@ -180,6 +196,19 @@ def get_ip():
 
     return ip 
 
+
+#------------------------------------------------------------------------------#
+
+def log_video_atendido(mensaje):
+
+  '''
+      Descripción:
+  '''
+  print("Parte del vídeo atendido",mensaje.parte)
+
+  # Se introduce el vídeo en el log del servidor
+  if (mensaje.parte == 3):
+    videos_atendidos[mensaje.ip_cliente,mensaje.port_cliente]= mensaje.video
 
 #------------------------------------------------------------------------------#
 
@@ -290,6 +319,11 @@ def escuchar_servidor_descarga():
         if (mensaje.id  == MENSAJE_INSCRIPCION_SD):
             # Se almacena la información recibida
             inscribir_sd([mensaje.ip,mensaje.port],mensaje.videos)
+            enviar_ack = True
+
+        elif (mensaje.id == MENSAJE_VIDEO_ATENDIDO):
+            print("ME LLEGÓ LA INFO DEL SERVIDOR DE DESCARGA")
+            log_video_atendido(mensaje)
             enviar_ack = True
 
 
