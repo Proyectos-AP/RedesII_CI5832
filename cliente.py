@@ -317,24 +317,14 @@ def verificar_servidor_central():
     mensaje = Mensaje_ack(20,"ping","probando_conexion")
     ack = enviar_info(IP_SERVIDOR,PORT,mensaje)
 
-    # Si se recibe respuesta, entonces se devuelve true
-    if (ack.id == mensaje.id and ack.type == "ack"):
-        return True
-    else:
-        return False
-
 #------------------------------------------------------------------------------#
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
 # Se verifica si el Servidor Central está activo.
-servidor_activo = verificar_servidor_central()
+verificar_servidor_central()
 
-if servidor_activo:
-    # Se muestra la consola al cliente
-    consola()
-
-else:
-    print("Error: El Servidor Central no se encuentra activo")
+# Se muestra la consola al cliente
+consola()
 
 #------------------------------------------------------------------------------#

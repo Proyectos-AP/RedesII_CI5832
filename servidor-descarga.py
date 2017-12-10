@@ -295,11 +295,45 @@ def consola():
             print("ERROR : La opción no es válida. Intente de nuevo")
 
 #------------------------------------------------------------------------------#
+
+def verificar_servidor_central():
+
+    # Se crea el socket
+    sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Se obtiene el hostname de la maquina
+    ip = get_ip()
+    
+    try:
+        # Conectamos el socket
+        sd_socket.connect((IP_SERVIDOR, PORT_ENVIO_SC))
+        sd_socket.settimeout(5)
+
+
+        # Se arma el mensaje que va a ser enviado al servidor.
+        mensaje = Mensaje_ack(20,"ping","probando_conexion")
+        data_string = pickle.dumps(mensaje)
+        sd_socket.send(data_string)
+
+        # Se espera la respuesta del servidor central
+        ack = sd_socket.recv(1024)                                     
+
+        # Se cierra el socket
+        sd_socket.close()
+
+    except:
+        sd_socket.close()
+        print("No se pudo establecer conexión con el Servidor Central")
+        exit(0)
+
+
+#------------------------------------------------------------------------------#
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
 
 # Verificar si el SC está conectado.
+verificar_servidor_central()
 
 # Se abre hilo para el inicio de sesión del servidor de descarga
 Thread(target=iniciar_servidor,args=()).start()
