@@ -186,7 +186,7 @@ def video(nombre_video):
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id and ack.type == "ack"):
             print("El vídeo se está procesando...")
-            escuchar_servidor_descarga()
+            #escuchar_servidor_descarga()
 
         elif (ack.id == mensaje.id and ack.type == "nack"):
             print("El vídeo introducido no se encuentra en la lista de vídeos disponibles.")
@@ -221,7 +221,7 @@ def escuchar_servidor_descarga():
     numero_videos = 0
 
     print("---- Se abrió socket para escuchar a Servidor de Descarga -----")
-    while (numero_videos < 3 ):
+    while (True):
 
         enviar_ack = False
 
@@ -248,7 +248,9 @@ def escuchar_servidor_descarga():
             clientsocket.send(data_string)
             clientsocket.close()
 
-    print("Se recibió el vídeo completo")
+        if (numero_videos > 2):
+            print("Se recibió el vídeo completo")
+            numero_videos = 0
 
 #------------------------------------------------------------------------------#
 
@@ -272,7 +274,13 @@ def consola():
                 # Se verifica si el número de puerto es correcto.
 
                 if ( len(ip_port)==2 and verificar_puerto(ip_port[1]) ):
+
+                    # Se inscribe el cliente en el servidor.
                     inscribir_cliente(ip_port[0],ip_port[1])
+
+                    # Se abre un puerto para escuchar las futuras descargas 
+                    # de vídeos.
+                    _thread.start_new_thread(escuchar_servidor_descarga,())
 
                 else:
                     print("No se han intoducido un número de puerto correcto.")
