@@ -32,8 +32,10 @@ import re
 #------------------------------------------------------------------------------#
 
 inscrito = False # Indica si el cliente está inscrito o no
-PORT = 9999
-IP = 0
+videos_disponibles   = []
+PORT                 = 9999
+PORT_ESCUCHA         = 0
+IP                   = 0
 MENSAJE_LISTA_VIDEOS = 34
 
 #------------------------------------------------------------------------------#
@@ -70,6 +72,7 @@ def inscribir_cliente(ip,port):
         Descripción:
     '''
     global inscrito
+    global PORT_ESCUCHA
     global PORT
     global IP
 
@@ -77,6 +80,7 @@ def inscribir_cliente(ip,port):
 
         # Se realizan la inscripcion del servidor
 
+        PORT_ESCUCHA = port
         # Se crea el socket
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -96,7 +100,7 @@ def inscribir_cliente(ip,port):
         client_socket.send(data_string)
 
         # Se espera el ACK
-        msg = client_socket.recv(1024)                                     
+        msg = client_socket.recv(4096)                                     
 
         # Se cierra el socket
         client_socket.close()
@@ -104,8 +108,11 @@ def inscribir_cliente(ip,port):
         # Se lee el ACK
         ack = pickle.loads(msg)
 
+        print("ACK",ack.id,ack.type)
+
+
         # Se verifica si el ACK es correcto.
-        if (ack.id == mensaje.id):
+        if (ack.id == mensaje.id and ack.type == "ack"):
             inscrito = True
             IP = ip
             print("El cliente se ha inscrito de forma satisfactoria")
@@ -126,6 +133,8 @@ def lista_videos():
         print(error_no_inscrito)
 
     else:
+
+        global videos_disponibles
         # Se hace la consulta de los videos disponibles
 
         # Se crea el socket
@@ -176,12 +185,40 @@ def video(nombre_video):
     if not (inscrito):
         print(error_no_inscrito)
     else:
-        # Se inicia la descarga del video
 
-        # Se crea la ventana que mostrará
-        # el status de descarga del 
-        # video 
-        print("video")
+        # Se crea el socket
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # Conectamos el socket
+        try:
+            client_socket.connect((IP, PORT))
+        except:
+            print("No se pudo establecer una conexón con el servidor central.")
+
+        # Se arma el mensaje que va a ser enviado al servidor.
+        mensaje = Mensaje_descarga_videos(IP,PORT_ESCUCHA,nombre_video)
+        data_string = pickle.dumps(mensaje)
+        client_socket.send(data_string)
+
+        # Se espera el ACK
+        msg = client_socket.recv(1024)                                     
+
+        # Se cierra el socket
+        client_socket.close()
+
+        # Se lee el ACK
+        ack = pickle.loads(msg)
+
+        # Se verifica si el ACK es correcto.
+        if (ack.id == mensaje.id and ack.type == "ack"):
+            print("El vídeo se está procesando...")
+
+        elif (ack.id == mensaje.id and ack.type == "nack"):
+            print("El vídeo introducido no se encuentra en la lista de vídeos disponibles.")
+
+        else:
+            print("El cliente no se ha podido hacer la petición al servidor. Intentelo de nuevo.")
+
 
 #------------------------------------------------------------------------------#
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
@@ -204,7 +241,7 @@ while True:
             ip_port = opcion[1].split(":")
             # Se verifica si el número de puerto es correcto.
 
-            if (verificar_puerto(ip_port[1])):
+            if ( len(ip_port)==2 and verificar_puerto(ip_port[1]) ):
                 inscribir_cliente(ip_port[0],ip_port[1])
 
             else:
@@ -217,7 +254,12 @@ while True:
         lista_videos()
 
     elif opcion[0] == "VIDEO":
-        video("Video_A_Descargar")
+
+        # Se verifica si los parametros instroducidos son correctos
+        if (len(opcion) == 2):
+            video(opcion[1])
+        else:
+            print("No se han intoducido los parametros del vídeo correctamente.")
 
     else:
         print("ERROR : La opción no es válida. Intente de nuevo")

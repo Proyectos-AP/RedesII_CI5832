@@ -34,8 +34,10 @@ class Mensaje_mostrar_videos:
 #------------------------------------------------------------------------------#
 
 class Mensaje_descarga_videos:
-	def __init__(self,video):
+	def __init__(self,ip,port,video):
 		self.id    = 23
+		self.ip    = ip
+		self.port  = port
 		self.video = video
 		self.type  = "cliente-sevidor"
 
@@ -43,9 +45,10 @@ class Mensaje_descarga_videos:
 
 class Mensaje_ack:
 
-	def __init__(self,id):
-		self.id = id
-		self.type = "ack"
+	def __init__(self,id,type,message=""):
+		self.id     = id
+		self.type   = type
+		self.message = message
 
 #------------------------------------------------------------------------------#
 
@@ -68,5 +71,16 @@ class Mensaje_inscripcion_SD:
 		self.port    = port
 		self.videos  = videos
 		self.type    = "sevidorD-sevidorC"
+
+#------------------------------------------------------------------------------#
+
+class Mensaje_atender_video:
+
+	def __init__(self,ip,port,video):
+		self.id             = 32
+		self.ip_cliente     = ip
+		self.port_cliente   = port
+		self.video          = video
+		self.type           = "sevidorC-sevidorD"
 
 #------------------------------------------------------------------------------#

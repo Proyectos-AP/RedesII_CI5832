@@ -25,9 +25,7 @@ import pickle
 #------------------------------------------------------------------------------#
 
 clientes                = {}
-
-videos_disponibles = []
-
+videos_disponibles      = []
 servidores_descarga     = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
@@ -56,11 +54,12 @@ def numero_descargas_video():
 
 #------------------------------------------------------------------------------#
 
-def videos_cliente():
+def asignar_video_cliente(ip,port,video):
+
     '''
         Descripción:
     '''
-    print("videos_cliente")
+    print("videos_cliente",ip,port,video)
 
 #------------------------------------------------------------------------------#
 def inscribir_cliente(addr):
@@ -176,14 +175,22 @@ def escuchar_cliente():
             enviar_ack = False
 
         elif (mensaje.id == MENSAJE_DESCARGA_VIDEO):
-            print("INFORMAR AL SERVIDOR DE DESCARGA")
-            enviar_ack = True
 
+            if (mensaje.video in videos_disponibles):
+                asignar_video_cliente(mensaje.ip, mensaje.port,mensaje.video)
+                enviar_ack = True
+
+            else:
+                # Se envia un NACK
+                ack = Mensaje_ack(mensaje.id,"nack")
+                data_string = pickle.dumps(ack)
+                clientsocket.send(data_string)
+                clientsocket.close()
 
         # Se envia un mensaje ACK al cliente.
         if (enviar_ack):
-            ack = Mensaje_ack(mensaje.id)
-            data_string = pickle.dumps(mensaje)
+            ack = Mensaje_ack(mensaje.id,"ack")
+            data_string = pickle.dumps(ack)
             clientsocket.send(data_string)
             clientsocket.close()
 
@@ -230,8 +237,8 @@ def escuchar_servidor_descarga():
 
         # Se envia un mensaje ACK al cliente.
         if (enviar_ack):
-            ack = Mensaje_ack(mensaje.id)
-            data_string = pickle.dumps(mensaje)
+            ack = Mensaje_ack(mensaje.id,"ack")
+            data_string = pickle.dumps(ack)
             clientsocket.send(data_string)
             clientsocket.close()
 

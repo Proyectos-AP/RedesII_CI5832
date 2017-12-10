@@ -103,7 +103,7 @@ def inscribir_servidor_descarga():
     ack = pickle.loads(msg)
 
     # Se verifica si el ACK es correcto.
-    if (ack.id == mensaje.id):
+    if (ack.id == mensaje.id and ack.type == "ack"):
         inscrito = True
         IP = ip
         print("El servidor se ha inscrito de forma satisfactoria.")
@@ -192,6 +192,9 @@ def consola():
 
 # Se abre hilo para el inicio de sesión del servidor de descarga
 _thread.start_new_thread(iniciar_servidor,())
+
+# Se abre hilo para escuchar las solicitudes del servidor central
+_thread.start_new_thread(escuchar_sc,())
 
 # Se abre la consola
 consola()
