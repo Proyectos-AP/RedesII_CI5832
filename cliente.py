@@ -37,6 +37,7 @@ videos_disponibles   = []
 PORT                 = 9999
 PORT_ESCUCHA         = 0
 IP                   = 0
+IP_SERVIDOR          = "192.168.0.106"
 MENSAJE_ENVIAR_VIDEO = 12
 MENSAJE_LISTA_VIDEOS = 34
 
@@ -121,7 +122,7 @@ def inscribir_cliente(ip,port):
         mensaje = Mensaje_inscripcion(ip,port)
 
         # Se envía mensaje al Servidor Central
-        ack = enviar_info(ip,PORT,mensaje)
+        ack = enviar_info(IP_SERVIDOR,PORT,mensaje)
 
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id and ack.type == "ack"):
@@ -151,7 +152,7 @@ def lista_videos():
 
         mensaje = Mensaje_mostrar_videos()
         # Se envía mensaje al Servidor Central
-        mensaje_videos = enviar_info(IP,PORT,mensaje)
+        mensaje_videos = enviar_info(IP_SERVIDOR,PORT,mensaje)
 
         # Se verifica si el mensaje es correcto.
         if (mensaje_videos.id == MENSAJE_LISTA_VIDEOS):
@@ -179,8 +180,8 @@ def video(nombre_video):
         # Se arma el mensaje que va a ser enviado al servidor.
         mensaje = Mensaje_descarga_videos(IP,PORT_ESCUCHA,nombre_video)
 
-        # Se envía mensaje al Servidor Central
-        ack = enviar_info(IP,PORT,mensaje)
+        # Se envía solicitud al Servidor Central
+        ack = enviar_info(IP_SERVIDOR,PORT,mensaje)
 
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id and ack.type == "ack"):
