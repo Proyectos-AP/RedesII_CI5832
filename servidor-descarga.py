@@ -21,6 +21,7 @@ from mensajes_cli_sc import *
 import socket
 import pickle 
 import _thread
+import random
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
@@ -30,7 +31,7 @@ import _thread
 PORT_ENVIO_SC          = 9998
 
 # Puerto para recibir info del Servidor Central
-PORT_ESCUCHA_SC        = 9997
+PORT_ESCUCHA_SC        = 0
 
 MENSAJE_ATENDER_VIDEO  = 32
 
@@ -49,6 +50,10 @@ def iniciar_servidor():
     '''
         Descripción:
     '''
+    
+    global PORT_ESCUCHA_SC
+
+    PORT_ESCUCHA_SC = random.randint(10000, 20000)
     
     # Se comunica con el servidor central.
     inscribir_servidor_descarga()

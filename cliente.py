@@ -274,6 +274,7 @@ def escuchar_servidor_descarga():
             clientsocket.send(data_string)
             clientsocket.close()
 
+    print("Se recibió el vídeo completo")
 
 
 #------------------------------------------------------------------------------#
