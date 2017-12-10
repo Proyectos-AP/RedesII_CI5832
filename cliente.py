@@ -249,52 +249,61 @@ def escuchar_servidor_descarga():
 
     print("Se recibió el vídeo completo")
 
+#------------------------------------------------------------------------------#
+
+def consola():
+
+    print("--- CLIENTE --- ")
+
+    while True:
+
+        opcion = input("CL ---> ")
+        argumento_recibido = ""
+
+        opcion = opcion.split(" ")
+
+        # Se extrae el valor del ip y el puerto
+        if opcion[0] == "INSCRIBIR":
+
+            # Se verifica si los parametros instroducidos son correctos
+            if (len(opcion) == 2):
+                ip_port = opcion[1].split(":")
+                # Se verifica si el número de puerto es correcto.
+
+                if ( len(ip_port)==2 and verificar_puerto(ip_port[1]) ):
+                    inscribir_cliente(ip_port[0],ip_port[1])
+
+                else:
+                    print("No se han intoducido un número de puerto correcto.")
+
+            else:
+                print("No se han intoducido los parametros de la inscripción correctamente.")
+
+        elif opcion[0] == "LISTA_VIDEOS":
+            lista_videos()
+
+        elif opcion[0] == "VIDEO":
+
+            # Se verifica si los parametros instroducidos son correctos
+            if (len(opcion) == 2):
+
+                # Se abre el hilo que se encargará de escuchar al servidor de descarga
+                _thread.start_new_thread(video,(opcion[1],))
+
+            else:
+                print("No se han intoducido los parametros del vídeo correctamente.")
+
+        else:
+            print("ERROR : La opción no es válida. Intente de nuevo")
+
 
 #------------------------------------------------------------------------------#
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
-print("--- CLIENTE --- ")
+# Se verifica si el Servidor Central está activo.
 
-while True:
-
-    opcion = input("CL ---> ")
-    argumento_recibido = ""
-
-    opcion = opcion.split(" ")
-
-    # Se extrae el valor del ip y el puerto
-    if opcion[0] == "INSCRIBIR":
-
-        # Se verifica si los parametros instroducidos son correctos
-        if (len(opcion) == 2):
-            ip_port = opcion[1].split(":")
-            # Se verifica si el número de puerto es correcto.
-
-            if ( len(ip_port)==2 and verificar_puerto(ip_port[1]) ):
-                inscribir_cliente(ip_port[0],ip_port[1])
-
-            else:
-                print("No se han intoducido un número de puerto correcto.")
-
-        else:
-            print("No se han intoducido los parametros de la inscripción correctamente.")
-
-    elif opcion[0] == "LISTA_VIDEOS":
-        lista_videos()
-
-    elif opcion[0] == "VIDEO":
-
-        # Se verifica si los parametros instroducidos son correctos
-        if (len(opcion) == 2):
-
-            # Se abre el hilo que se encargará de escuchar al servidor de descarga
-            _thread.start_new_thread(video,(opcion[1],))
-
-        else:
-            print("No se han intoducido los parametros del vídeo correctamente.")
-
-    else:
-        print("ERROR : La opción no es válida. Intente de nuevo")
+# Se muestra la consola al cliente
+consola()
 
 #------------------------------------------------------------------------------#
