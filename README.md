@@ -19,7 +19,7 @@ Esta implementación corresponde al proyecto final del Laboratorio del curso "Re
 - Ejecute el siguiente siguiente comando para instalar el resto de los requerimientos de la aplicación.
 
 ``` bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Ejecución 
