@@ -149,29 +149,9 @@ def lista_videos():
         global videos_disponibles
         # Se hace la consulta de los videos disponibles
 
-        # Se crea el socket
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
-        # Conectamos el socket
-        try:
-            client_socket.connect((IP, PORT))
-        except:
-            print("No se pudo establecer una conexón con el servidor central.")
-        
-
-        # Se arma el mensaje que va a ser enviado al servidor.
         mensaje = Mensaje_mostrar_videos()
-        data_string = pickle.dumps(mensaje)
-        client_socket.send(data_string)
-
-        # Se espera la respuesta del servidor central
-        mensaje_videos = client_socket.recv(1024)                                     
-
-        # Se cierra el socket
-        client_socket.close()
-
-        # Se lee el ACK
-        mensaje_videos = pickle.loads(mensaje_videos)
+        # Se envía mensaje al Servidor Central
+        mensaje_videos = enviar_info(IP,PORT,mensaje)
 
         # Se verifica si el mensaje es correcto.
         if (mensaje_videos.id == MENSAJE_LISTA_VIDEOS):
