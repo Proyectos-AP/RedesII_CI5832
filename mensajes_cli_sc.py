@@ -84,3 +84,16 @@ class Mensaje_atender_video:
 		self.type           = "sevidorC-sevidorD"
 
 #------------------------------------------------------------------------------#
+#                           DEFINICIÓN DE FUNCIONES                            #
+#------------------------------------------------------------------------------#
+
+class Mensaje_enviar_video:
+
+	def __init__(self,ip,port,video):
+		self.id             = 12
+		self.ip             = ip
+		self.port           = port
+		self.video          = video
+		self.type           = "sevidorD-cliente"
+
+#------------------------------------------------------------------------------#

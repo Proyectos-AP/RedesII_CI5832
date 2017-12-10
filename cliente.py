@@ -16,6 +16,7 @@
 #------------------------------------------------------------------------------#
 
 from mensajes_cli_sc import *
+import _thread
 import socket
 import pickle 
 import re
@@ -36,6 +37,7 @@ videos_disponibles   = []
 PORT                 = 9999
 PORT_ESCUCHA         = 0
 IP                   = 0
+MENSAJE_ENVIAR_VIDEO = 12
 MENSAJE_LISTA_VIDEOS = 34
 
 #------------------------------------------------------------------------------#
@@ -80,7 +82,7 @@ def inscribir_cliente(ip,port):
 
         # Se realizan la inscripcion del servidor
 
-        PORT_ESCUCHA = port
+        PORT_ESCUCHA = int(port)
         # Se crea el socket
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -212,12 +214,68 @@ def video(nombre_video):
         # Se verifica si el ACK es correcto.
         if (ack.id == mensaje.id and ack.type == "ack"):
             print("El vídeo se está procesando...")
+            escuchar_servidor_descarga()
 
         elif (ack.id == mensaje.id and ack.type == "nack"):
             print("El vídeo introducido no se encuentra en la lista de vídeos disponibles.")
 
         else:
             print("El cliente no se ha podido hacer la petición al servidor. Intentelo de nuevo.")
+
+
+#------------------------------------------------------------------------------#
+
+def escuchar_servidor_descarga():
+
+    '''
+        Descripción:
+    '''
+
+    # Se crea el socket
+    serversocket = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM) 
+
+                    
+    # bind to the PORT_CLIENTE
+
+    # Conectamos el socket
+    try:
+        serversocket.bind((IP, PORT_ESCUCHA))
+    except:
+        print("No se pudo establecer una conexón con el servidor central.")                                  
+
+    # queue up to 5 requests
+    serversocket.listen(3) 
+    numero_videos = 0
+
+    print("---- Se abrió socket para escuchar a Servidor de Descarga -----")
+    while (numero_videos < 3 ):
+
+        enviar_ack = False
+
+        # Se establece la conexion
+        clientsocket,addr = serversocket.accept()
+
+        # Se recibe la información enviada por los SD.      
+        data = clientsocket.recv(4096)
+        mensaje = pickle.loads(data)
+
+
+        if (mensaje.id  == MENSAJE_ENVIAR_VIDEO):
+
+            # Se reciben las partes del vídeo
+            print("Recibida parte",numero_videos)
+            enviar_ack = True
+            numero_videos += 1
+
+
+        # Se envia un mensaje ACK al cliente.
+        if (enviar_ack):
+            ack = Mensaje_ack(mensaje.id,"ack")
+            data_string = pickle.dumps(ack)
+            clientsocket.send(data_string)
+            clientsocket.close()
+
 
 
 #------------------------------------------------------------------------------#
@@ -257,7 +315,10 @@ while True:
 
         # Se verifica si los parametros instroducidos son correctos
         if (len(opcion) == 2):
-            video(opcion[1])
+
+            # Se abre el hilo que se encargará de escuchar al servidor de descarga
+            _thread.start_new_thread(video,(opcion[1],))
+
         else:
             print("No se han intoducido los parametros del vídeo correctamente.")
 

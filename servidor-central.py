@@ -177,7 +177,13 @@ def escuchar_cliente():
         elif (mensaje.id == MENSAJE_DESCARGA_VIDEO):
 
             if (mensaje.video in videos_disponibles):
-                asignar_video_cliente(mensaje.ip, mensaje.port,mensaje.video)
+                print("Se está procesando un vídeo para un cliente...")
+
+                # Se abre un hilo para empezar a asignar tareas a los servidores
+                # de descarga.
+                _thread.start_new_thread(asignar_video_cliente,(mensaje.ip,
+                                         mensaje.port,mensaje.video,))
+                
                 enviar_ack = True
 
             else:
