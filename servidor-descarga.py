@@ -20,7 +20,7 @@
 from mensajes_cli_sc import *
 import socket
 import pickle 
-import _thread
+from threading import Thread, Lock
 import random
 
 #------------------------------------------------------------------------------#
@@ -40,7 +40,12 @@ videos_disponibles = [
     "How_To_Flirt",
     "Frozen_iPhone",
     "Tove_Lo_Habits",
-]   
+]
+
+total_videos_descargando = set()
+total_videos_descargados = set()
+
+mutex = Lock()
 
 #------------------------------------------------------------------------------#
 #                       DEFINICIÓN DE FUNCIONES DEL MENÚ                       #
@@ -91,8 +96,12 @@ def inscribir_servidor_descarga():
     # Se obtiene el hostname de la maquina
     ip = get_ip()
     
-    # Conectamos el socket
-    sd_socket.connect((ip, PORT_ENVIO_SC))
+    try:
+        # Conectamos el socket
+        sd_socket.connect((ip, PORT_ENVIO_SC))
+    except:
+        print("No se pudo establecer conexión con el Servidor Centra")
+        exit(0)
 
     # Se prepara el mensaje para ser enviado
     mensaje = Mensaje_inscripcion_SD(ip,PORT_ESCUCHA_SC,videos_disponibles)
@@ -137,7 +146,8 @@ def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
     try:
         sd_socket.connect((ip_sd,port_cliente))
     except:
-        print("No se pudo establecer una conexón con el servidor descarga.")
+        print("No se pudo establecer una conexón.")
+        exit(0)
     
 
     # Se arma el mensaje que va a ser enviado al servidor.
@@ -158,6 +168,16 @@ def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
 
 def atender_cliente(ip,port,video,parte):
 
+    global mutex
+    global total_videos_descargando
+    global total_videos_descargados
+
+    # Se registra el vídeo que se esta descargando haciendo uso de semaforos.
+    mutex.acquire()
+    total_videos_descargando.add(video)
+    mutex.release()
+
+
     # Se obtiene el ip de la maquina
     ip_sd = get_ip()
 
@@ -171,11 +191,16 @@ def atender_cliente(ip,port,video,parte):
     if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
         print("Se envio una parte del vídeo al cliente...")
 
+        # Se registra el vídeo atendido haciendo uso de semaforos.
+        mutex.acquire()
+        total_videos_descargando.discard(video)
+        total_videos_descargados.add(video)
+        mutex.release()
+
         # Se ĺe informa al servidor que el vídeo ya fué enviado
         ip,port,video,parte
         mensaje = Mensaje_video_atendido(ip,port,video,parte)
         ack = enviar_video_cliente(ip,PORT_ENVIO_SC,mensaje)
-
         print("Se recibió ACK del SC",ack)
 
 #------------------------------------------------------------------------------#
@@ -216,8 +241,8 @@ def escuchar_sc():
         if (mensaje.id == MENSAJE_ATENDER_VIDEO):
 
             # Se crea un hilo para que se atienda la solicitud del cliente
-            _thread.start_new_thread(atender_cliente,(mensaje.ip_cliente,
-                                    mensaje.port_cliente,mensaje.video,mensaje.parte,))
+            Thread(target=atender_cliente,args=(mensaje.ip_cliente,
+                                    mensaje.port_cliente,mensaje.video,mensaje.parte,)).start()
 
             enviar_ack = True
 
@@ -236,7 +261,7 @@ def videos_descargando():
     '''
         Descripción:
     '''
-    print("videos_descargando")
+    print("Los vídeos que se están descargando son: ",total_videos_descargando)
 
 #------------------------------------------------------------------------------#
 
@@ -244,7 +269,8 @@ def videos_descargados():
     '''
         Descripción:
     '''
-    print("videos_descargados")
+
+    print("Los vídeos descargandos son: ",total_videos_descargados)
 
 #------------------------------------------------------------------------------#
 
@@ -272,14 +298,16 @@ def consola():
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
+
+# Verificar si el SC está conectado.
+
 # Se abre hilo para el inicio de sesión del servidor de descarga
-_thread.start_new_thread(iniciar_servidor,())
+Thread(target=iniciar_servidor,args=()).start()
 
 # Se abre hilo para escuchar las solicitudes del servidor central
-_thread.start_new_thread(escuchar_sc,())
+Thread( target=escuchar_sc,args=() ).start()
 
 # Se abre la consola
 consola()
-
 
 #------------------------------------------------------------------------------#
