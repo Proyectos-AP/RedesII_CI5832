@@ -176,8 +176,6 @@ def lista_videos():
             print("El servidor no ha podido enviar los vídeos disponibles. Intentelo de nuevo.")
 
 
-
-
 #------------------------------------------------------------------------------#
 
 def video(nombre_video):

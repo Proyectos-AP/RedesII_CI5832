@@ -76,11 +76,12 @@ class Mensaje_inscripcion_SD:
 
 class Mensaje_atender_video:
 
-	def __init__(self,ip,port,video):
+	def __init__(self,ip,port,video,parte):
 		self.id             = 32
 		self.ip_cliente     = ip
 		self.port_cliente   = port
 		self.video          = video
+		self.parte          = parte
 		self.type           = "sevidorC-sevidorD"
 
 #------------------------------------------------------------------------------#
@@ -89,11 +90,12 @@ class Mensaje_atender_video:
 
 class Mensaje_enviar_video:
 
-	def __init__(self,ip,port,video):
+	def __init__(self,ip,port,video,parte):
 		self.id             = 12
 		self.ip             = ip
 		self.port           = port
 		self.video          = video
+		self.parte          = parte
 		self.type           = "sevidorD-cliente"
 
 #------------------------------------------------------------------------------#

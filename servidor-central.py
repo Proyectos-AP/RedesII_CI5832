@@ -33,6 +33,7 @@ MENSAJE_INSCRIPCION     = 21
 MENSAJE_MOSTRAR_VIDEO   = 22
 MENSAJE_DESCARGA_VIDEO  = 23
 MENSAJE_INSCRIPCION_SD  = 11
+MENSAJE_ATENDER_VIDEO   = 32
 
 #------------------------------------------------------------------------------#
 #                           DEFINICIÓN DE FUNCIONES                            #
@@ -54,12 +55,63 @@ def numero_descargas_video():
 
 #------------------------------------------------------------------------------#
 
-def asignar_video_cliente(ip,port,video):
+def enviar_video_cliente(ip,port,video):
 
     '''
         Descripción:
     '''
-    print("videos_cliente",ip,port,video)
+
+    parte_video = 0
+
+    for server in servidores_descarga:
+
+        mensaje_recibido, sd_socket = asignar_video_sd(server[0],server[1],ip,port,video,parte_video)
+
+        # Se recibe el ACK del Servidor de Descarga.
+        if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
+
+            # Se espera a que el SD evíe el vídeo al cliente y envíe 
+            # su confirmación
+            #msg = sd_socket.recv(1024)
+            print("Recibido ACK del SD") 
+
+
+
+#------------------------------------------------------------------------------#
+
+def asignar_video_sd(ip_sd,port_sd,ip_cliente,port_cliente,video,parte):
+
+    '''
+        Descripción:
+    '''
+
+    # Se crea el socket
+    sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Se obtiene el ip de la maquina
+    server_ip = get_ip()
+    
+    # Conectamos el socket
+    try:
+        sd_socket.connect((server_ip,port_sd))
+    except:
+        print("No se pudo establecer una conexón con el servidor descarga.")
+    
+
+    # Se arma el mensaje que va a ser enviado al servidor.
+    mensaje = Mensaje_atender_video(ip_cliente,port_cliente,video,parte)
+    data_string = pickle.dumps(mensaje)
+    sd_socket.send(data_string)
+
+    # Se espera el ACK
+    msg = sd_socket.recv(1024) 
+
+    sd_socket.close()                                    
+
+    # Se lee el ACK
+    mensaje_final = pickle.loads(msg)
+
+    return mensaje_final,sd_socket
 
 #------------------------------------------------------------------------------#
 def inscribir_cliente(addr):
@@ -181,9 +233,9 @@ def escuchar_cliente():
 
                 # Se abre un hilo para empezar a asignar tareas a los servidores
                 # de descarga.
-                _thread.start_new_thread(asignar_video_cliente,(mensaje.ip,
+                _thread.start_new_thread(enviar_video_cliente,(mensaje.ip,
                                          mensaje.port,mensaje.video,))
-                
+
                 enviar_ack = True
 
             else:

@@ -27,10 +27,12 @@ import _thread
 #------------------------------------------------------------------------------#
 
 # Puerto para enviar info al Servidor Central
-PORT_ENVIO_SC   = 9998
+PORT_ENVIO_SC          = 9998
 
 # Puerto para recibir info del Servidor Central
-PORT_ESCUCHA_SC = 9997
+PORT_ESCUCHA_SC        = 9997
+
+MENSAJE_ATENDER_VIDEO  = 32
 
 videos_disponibles = [
     "La_Divaza_En_Mexico",
@@ -114,6 +116,58 @@ def inscribir_servidor_descarga():
 
 #------------------------------------------------------------------------------#
 
+def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
+
+    '''
+        Descripción:
+    '''
+
+    # Se crea el socket
+    sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    
+    # Se obtiene el ip de la maquina
+    ip_sd = get_ip()
+
+    try:
+        sd_socket.connect((ip_sd,port_cliente))
+    except:
+        print("No se pudo establecer una conexón con el servidor descarga.")
+    
+
+    # Se arma el mensaje que va a ser enviado al servidor.
+    data_string = pickle.dumps(mensaje)
+    sd_socket.send(data_string)
+
+    # Se espera el ACK
+    msg = sd_socket.recv(1024) 
+
+    sd_socket.close()                                    
+
+    # Se lee el ACK
+    mensaje_final = pickle.loads(msg)
+
+    return mensaje_final
+
+#------------------------------------------------------------------------------#
+
+def atender_cliente(ip,port,video,parte):
+
+    # Se obtiene el ip de la maquina
+    ip_sd = get_ip()
+
+    # Armo el mensaje que va a ser enviado al cliente.
+    mensaje = Mensaje_enviar_video(ip_sd,port,video,parte)
+
+    # Envio el mensaje al cliente.
+    mensaje_respuesta = enviar_video_cliente(ip,port,mensaje)
+
+    # Se verifica si el ACK es correcto.
+    if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
+        print("Se envio una parte del vídeo al cliente...")
+
+#------------------------------------------------------------------------------#
+
 def escuchar_sc():
 
     '''
@@ -146,6 +200,21 @@ def escuchar_sc():
         # Se recibe la información enviada por los SD.      
         data = clientsocket.recv(1024)
         mensaje = pickle.loads(data)
+
+        if (mensaje.id == MENSAJE_ATENDER_VIDEO):
+
+            atender_cliente(mensaje.ip_cliente,mensaje.port_cliente,
+                            mensaje.video,mensaje.parte)
+            enviar_ack = True
+
+
+        # Se envia un mensaje ACK al Servidor Central.
+        if (enviar_ack):
+            ack = Mensaje_ack(mensaje.id,"ack")
+            data_string = pickle.dumps(ack)
+            clientsocket.send(data_string)
+            clientsocket.close()
+
 
 
 #------------------------------------------------------------------------------#
