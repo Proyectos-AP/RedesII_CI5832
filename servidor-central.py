@@ -86,7 +86,7 @@ def enviar_video_cliente(ip,port,video):
     mensaje_recibido, sd_socket = asignar_video_sd(sd_server[0],sd_server[1],ip,port,video,0)
 
     # Se recibe el ACK del Servidor de Descarga.
-    print("Mensaje recibido",mensaje_recibido.id,mensaje_recibido.type)
+    #print("Mensaje recibido",mensaje_recibido.id,mensaje_recibido.type)
 
     if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
 
@@ -145,7 +145,7 @@ def inscribir_cliente(addr):
                                         puerto=(addr[1]))
     commit()
 
-    print("Se ha inscrito el cliente",addr)
+    print("- Se ha inscrito el cliente",nuevo_cliente.direccion_ip, nuevo_cliente.puerto)
 
 
 #------------------------------------------------------------------------------#
@@ -178,7 +178,7 @@ def inscribir_sd(addr,videos):
     # - testing -
     # for video in nuevo_sd.videos:
     #     print(video.nombre)
-    print("VIDEOS DISPONIBLES",videos_disponibles)
+    #print("VIDEOS DISPONIBLES",videos_disponibles)
     print("- Se ha inscrito el Servidor de descarga",nuevo_sd.direccion_ip, nuevo_sd.puerto)
 
 #------------------------------------------------------------------------------#
@@ -312,7 +312,7 @@ def escuchar_cliente():
 
             if video_solicitado:
 
-                print("Se encontro en la BD")
+                #print("Se encontro en la BD")
 
                 # Se obtiene la entidad del cliente
                 cliente_actual = modelo_db_sc.Cliente.get(direccion_ip=mensaje.ip)
@@ -333,7 +333,8 @@ def escuchar_cliente():
                 nueva_descarga.parte_actual = 4
 
             else:
-                print("No se encontro")
+                #print("No se encontro")
+                pass
 
             if (mensaje.video in videos_disponibles):
                 print("- Se está procesando un vídeo para un cliente ",addr,"...")

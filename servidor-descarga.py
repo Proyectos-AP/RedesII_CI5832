@@ -105,7 +105,7 @@ def inscribir_servidor_descarga():
         # Conectamos el socket
         sd_socket.connect((IP_SERVIDOR, PORT_ENVIO_SC))
     except:
-        print("No se pudo establecer conexión con el Servidor Centra")
+        print("- No se pudo establecer conexión con el Servidor Central")
         exit(0)
 
     # Se prepara el mensaje para ser enviado
@@ -166,7 +166,7 @@ def enviar_info(ip_cliente,port_cliente,mensaje):
     try:
         sd_socket.connect((ip_cliente,port_cliente))
     except:
-        print("No se pudo establecer una conexón.")
+        print("- No se pudo establecer una conexión.")
         exit(0)
     
 
@@ -203,7 +203,7 @@ def atender_cliente(ip,port,video,parte):
     # Se obtiene el ip de la maquina
     ip_sd = get_ip()
 
-    print("Video a enviar",video)
+    print("- Video a enviar",video)
     
     video_solicitado = modelo_db_sd.Video.get(nombre=video)
 
@@ -218,7 +218,7 @@ def atender_cliente(ip,port,video,parte):
     try:
         sd_socket.connect((ip,port))
     except:
-        print("No se pudo establecer una conexión.")
+        print("- No se pudo establecer una conexión.")
         exit(0)
     
     video_size = os.stat(video_solicitado.ubicacion_archivo).st_size
@@ -243,7 +243,7 @@ def atender_cliente(ip,port,video,parte):
 
     print("- Se terminó de enviar el vídeo",video,"al cliente",ip)
 
-    print("Terminé de enviar el vídeo")
+    #print("Terminé de enviar el vídeo")
     #msg = sd_socket.recv(1024)
     #sd_socket.close()
 
@@ -300,7 +300,7 @@ def escuchar_sc():
         # Se recibe la información enviada por los SD.      
         data = clientsocket.recv(1024)
         mensaje = pickle.loads(data)
-        print("Mensaje",mensaje)
+        #print("Mensaje",mensaje)
 
         if (mensaje.id == MENSAJE_ATENDER_VIDEO):
 
@@ -322,7 +322,7 @@ def escuchar_sc():
             #    ip,port,video,parte
             mensaje = Mensaje_video_atendido(mensaje.ip,mensaje.port,mensaje.video,0)
             ack = enviar_info(IP_SERVIDOR,PORT_ENVIO_SC,mensaje)
-            print("Se envió información estadística al Servidor Central...")
+            print("- Se envió información estadística al Servidor Central...")
         
         # Se envia un mensaje ACK al Servidor Central.
         if (enviar_ack):
@@ -408,7 +408,7 @@ def verificar_servidor_central():
 
     except:
         sd_socket.close()
-        print("No se pudo establecer conexión con el Servidor Central")
+        print("- No se pudo establecer conexión con el Servidor Central")
         exit(0)
 
 
