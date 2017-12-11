@@ -76,7 +76,7 @@ def iniciar_servidor():
 def get_ip():
 
     '''
-        Descripción: Se obtiene la dirección IP del servidor de descarga
+        Descripción:
     '''
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -91,8 +91,7 @@ def get_ip():
 
 def inscribir_servidor_descarga():
     '''
-        Descripción: Se inscribe el servidor de descarga con el servidor 
-        central
+        Descripción:
     '''
 
     # Se crea el socket
