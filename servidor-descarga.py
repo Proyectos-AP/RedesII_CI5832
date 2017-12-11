@@ -184,6 +184,7 @@ def enviar_info(ip_cliente,port_cliente,mensaje):
 
 #------------------------------------------------------------------------------#
 
+@db_session
 def atender_cliente(ip,port,video,parte):
     '''
         Descripción: Se atiende la solicitud del cliente
@@ -204,8 +205,11 @@ def atender_cliente(ip,port,video,parte):
     ip_sd = get_ip()
 
     print("Video a enviar",video)
+    
+    video_solicitado = modelo_db_sd.Video.get(nombre=video)
+
     # Se abre la lectura del archivo
-    video_a_enviar = open("./Video_1.mp4", "rb")
+    video_a_enviar = open(video_solicitado.ubicacion_archivo, "rb")
     info_video = video_a_enviar.read(BUFFER)
 
     # Se crea el socket
@@ -218,7 +222,7 @@ def atender_cliente(ip,port,video,parte):
         print("No se pudo establecer una conexión.")
         exit(0)
     
-    video_size = os.stat(video).st_size
+    video_size = os.stat(video_solicitado.ubicacion_archivo).st_size
 
     # Armo el mensaje que va a ser enviado al cliente.
     mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video_size,parte,video)
