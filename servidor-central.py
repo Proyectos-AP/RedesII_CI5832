@@ -27,7 +27,6 @@ import random
 #                            VARIABLES GLOBALES                                #
 #------------------------------------------------------------------------------#
 
-clientes                = {}
 videos_disponibles      = set()
 servidores_descarga     = {}
 videos_atendidos        = {}
@@ -138,11 +137,6 @@ def inscribir_cliente(addr):
     '''
         Descripción:
     '''
-
-    global clientes
-
-    clientes[addr[0],addr[1]] = ""
-
     # Se crea el cliente en la BD
     nuevo_cliente = modelo_db_sc.Cliente(direccion_ip=addr[0], 
                                         puerto=(addr[1]))
