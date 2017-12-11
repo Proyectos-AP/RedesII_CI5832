@@ -219,31 +219,47 @@ def escuchar_servidor_descarga():
     # queue up to 5 requests
     serversocket.listen(5) 
 
-    
-    while True:
+    while (True):
+
+        enviar_ack = False
 
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()
 
+        # Se recibe la información enviada por los SD.      
+        data = clientsocket.recv(4096)
+        mensaje = pickle.loads(data)
 
-        while True:
 
-            video_recibido = open("./video_recibido.mp4", "ab")
-            # Se recibe el vídeo      
-            buffer_recibido = clientsocket.recv(1024)
+        if (mensaje.id  == MENSAJE_ENVIAR_VIDEO):
 
-            if not(buffer_recibido):
-                video_recibido.close()
-                break
+            # Se reciben las partes del vídeo
+            #enviar_ack = True
+            
+            video_recibido = open(mensaje.nombre_video+str(2), "wb")
 
-            # Se escribe en el archivo del vídeo
-            video_recibido.write(buffer_recibido)
+            # Se empieza a recibir streaming de vídeo
+            while True:
+
+                data = clientsocket.recv(1024)
+
+                if not(data):
+                    video_recibido.close()
+                    break
+
+                video_recibido.write(data)
+
+            print("Se recibió todo el vídeo")
+            clientsocket.close()
             video_recibido.close()
 
-        clientsocket.close()
-        print("Se recibió el vídeo.")
+        # Se envia un mensaje ACK al cliente.
+        if (enviar_ack):
+            ack = Mensaje_ack(mensaje.id,"ack")
+            data_string = pickle.dumps(ack)
+            clientsocket.send(data_string)
+            clientsocket.close()
 
-        
 #------------------------------------------------------------------------------#
 
 def consola():

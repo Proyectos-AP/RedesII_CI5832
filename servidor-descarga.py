@@ -219,9 +219,9 @@ def atender_cliente(ip,port,video,parte):
     video_size = os.stat(video).st_size
 
     # Armo el mensaje que va a ser enviado al cliente.
-    #mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video_size,parte,video)
-    #data_string = pickle.dumps(mensaje)
-    #sd_socket.sendall(data_string)
+    mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video_size,parte,video)
+    data_string = pickle.dumps(mensaje)
+    sd_socket.sendall(data_string)
 
     # Se empieza a enviar el vídeo
     while (info_video):
