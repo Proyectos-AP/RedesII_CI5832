@@ -321,7 +321,7 @@ def escuchar_servidor_descarga():
             enviar_ack = True
 
         elif (mensaje.id == MENSAJE_VIDEO_ATENDIDO):
-            print("ME LLEGÓ LA INFO DEL SERVIDOR DE DESCARGA")
+            print("Me llegó info del servidor de descarga.")
             log_video_atendido(mensaje)
             enviar_ack = True
 

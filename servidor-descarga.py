@@ -39,6 +39,8 @@ PORT_ESCUCHA_SC        = 0
 
 MENSAJE_ATENDER_VIDEO  = 32
 
+MENSAJE_ENVIAR_VIDEO   = 12
+
 videos_disponibles = [
     "La_Divaza_En_Mexico",
     "How_To_Flirt",
@@ -292,6 +294,7 @@ def escuchar_sc():
         # Se recibe la información enviada por los SD.      
         data = clientsocket.recv(1024)
         mensaje = pickle.loads(data)
+        print("Mensaje",mensaje)
 
         if (mensaje.id == MENSAJE_ATENDER_VIDEO):
 
@@ -301,6 +304,20 @@ def escuchar_sc():
 
             enviar_ack = True
 
+        if (mensaje.id == MENSAJE_ENVIAR_VIDEO and mensaje.type == "ack"):
+
+            # Se registra el vídeo atendido haciendo uso de semaforos.
+            mutex.acquire()
+            total_videos_descargando.discard(mensaje.video)
+            total_videos_descargados.add(mensaje.video)
+            mutex.release()
+
+            #Se ĺe informa al servidor que el vídeo ya fué enviado
+            #    ip,port,video,parte
+            mensaje = Mensaje_video_atendido(mensaje.ip,mensaje.port,mensaje.video,0)
+            ack = enviar_info(IP_SERVIDOR,PORT_ENVIO_SC,mensaje)
+            print("Se envió información estadística al Servidor Central...")
+        
         # Se envia un mensaje ACK al Servidor Central.
         if (enviar_ack):
             ack = Mensaje_ack(mensaje.id,"ack")

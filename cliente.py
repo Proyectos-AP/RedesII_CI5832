@@ -253,9 +253,10 @@ def escuchar_servidor_descarga():
             
             #clientsocket.close()
             video_recibido.close()
+            clientsocket.close()
             print("Se recibió el vídeo ",mensaje.nombre_video)
-            enviar_ack = True
-            
+
+            enviar_ack_sd(mensaje.id,mensaje.ip,mensaje.port,mensaje.nombre_video)
 
         # Se envia un mensaje ACK al cliente.
         if (enviar_ack):
@@ -263,6 +264,34 @@ def escuchar_servidor_descarga():
             data_string = pickle.dumps(ack)
             clientsocket.send(data_string)
             clientsocket.close()
+
+#------------------------------------------------------------------------------#
+
+def enviar_ack_sd(id_mensaje,ip,port,video):
+
+
+    '''
+        Descripción:
+    '''
+
+    # Se crea el socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+    # Conectamos el socket
+    try:
+        client_socket.connect((ip, port))
+    except:
+        print("No se pudo establecer una conexón con el servidor central.")
+        
+
+    # Se arma el mensaje que va a ser enviado al servidor.
+    mensaje = Mensaje_ack_sd(id_mensaje,IP,PORT,video,"ack")
+    #mensaje = Mensaje_ack(id_mensaje,"ack",[IP,PORT,video])
+    data_string = pickle.dumps(mensaje)
+    client_socket.send(data_string)
+                         
+    # Se cierra el socket
+    client_socket.close()
 
 #------------------------------------------------------------------------------#
 

@@ -99,6 +99,17 @@ class Mensaje_video_atendido:
 
 #------------------------------------------------------------------------------#
 
+class Mensaje_ack_sd:
+
+	def __init__(self,id,ip,port,video,tipo):
+		self.id             = id
+		self.ip             = ip
+		self.port           = port
+		self.video          = video
+		self.type           = tipo
+
+#------------------------------------------------------------------------------#
+
 class Mensaje_atender_video:
 	'''
 		Descripción:
