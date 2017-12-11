@@ -99,6 +99,7 @@ def inscribir_servidor_descarga():
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sd_socket.settimeout(8)
 
     # Se obtiene el hostname de la maquina
     ip = get_ip()
@@ -146,6 +147,7 @@ def enviar_info(ip_cliente,port_cliente,mensaje):
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sd_socket.settimeout(8)
 
     
     try:

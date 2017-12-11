@@ -102,6 +102,7 @@ def asignar_video_sd(ip_sd,port_sd,ip_cliente,port_cliente,video,parte):
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sd_socket.settimeout(8)
     
     # Conectamos el socket
     try:

@@ -230,6 +230,7 @@ def escuchar_servidor_descarga():
 
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()
+        clientsocket.settimeout(5)
 
         # Se recibe la información enviada por los SD.      
         data = clientsocket.recv(8192)
@@ -245,7 +246,7 @@ def escuchar_servidor_descarga():
             # Se reciben las partes del vídeo
             #enviar_ack = True
             
-            video_recibido = open(str(mensaje.nombre_video)+str(2), "wb")
+            video_recibido = open(str(mensaje.nombre_video), "wb")
 
             # Se empieza a recibir streaming de vídeo
             while True:
@@ -284,6 +285,7 @@ def enviar_ack_sd(id_mensaje,ip,port,video):
 
     # Se crea el socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.settimeout(5)
         
     # Conectamos el socket
     try:
