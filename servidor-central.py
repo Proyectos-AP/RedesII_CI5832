@@ -20,6 +20,7 @@ from mensajes_cli_sc import *
 import socket
 import pickle 
 import random
+import sys
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
@@ -55,7 +56,7 @@ def numero_descargas_video():
     '''
         Descripción:
     '''
-    print("El número de descargas realizadas es:",len(videos_atendidos))
+    print("- El número de descargas realizadas es:",len(videos_atendidos))
 
 #------------------------------------------------------------------------------#
 
@@ -65,7 +66,7 @@ def videos_cliente():
         Descripción:
     '''
 
-    print("Los vídeos atendidos son:")
+    print("- Los vídeos atendidos son:")
     print(videos_atendidos)
 
 
@@ -77,22 +78,18 @@ def enviar_video_cliente(ip,port,video):
         Descripción:
     '''
 
-    parte_video = 1
-
     sd_server, sd_videos = random.choice(list(servidores_descarga.items()))
 
     mensaje_recibido, sd_socket = asignar_video_sd(sd_server[0],sd_server[1],ip,port,video,0)
 
     # Se recibe el ACK del Servidor de Descarga.
-    print("Mensaje recibido",mensaje_recibido.id,mensaje_recibido.type)
-
     if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
 
         # Se espera a que el SD evíe el vídeo al cliente y envíe 
         # su confirmación
         #msg = sd_socket.recv(1024)
-        print("Recibido ACK del SD")
-        parte_video += 1
+        print("- Se le asignó el vídeo ",video,"al Servidor de Descarga",sd_server[0])
+
 
 
 #------------------------------------------------------------------------------#
@@ -111,6 +108,7 @@ def asignar_video_sd(ip_sd,port_sd,ip_cliente,port_cliente,video,parte):
         sd_socket.connect((ip_sd,port_sd))
     except:
         print("No se pudo establecer una conexón con el servidor descarga.")
+        sys.exit()
     
 
     # Se arma el mensaje que va a ser enviado al servidor.
@@ -139,7 +137,7 @@ def inscribir_cliente(addr):
 
     clientes[addr[0],addr[1]] = ""
 
-    print("Se ha inscrito el cliente",addr)
+    print("- Se ha inscrito el cliente",addr)
 
 
 #------------------------------------------------------------------------------#
@@ -156,8 +154,7 @@ def inscribir_sd(addr,videos):
     servidores_descarga[addr[0],addr[1]] = videos
     videos_disponibles = videos_disponibles.union(set(videos))
 
-    print("VIDEOS DISPONIBLES",videos_disponibles)
-    print("Se ha inscrito el Servidor de descarga",servidores_descarga)
+    print("- Se ha inscrito el Servidor de descarga: ",addr)
 
 #------------------------------------------------------------------------------#
 
@@ -204,11 +201,9 @@ def log_video_atendido(mensaje):
   '''
       Descripción:
   '''
-  print("Parte del vídeo atendido",mensaje.parte)
-
+ 
   # Se introduce el vídeo en el log del servidor
-  if (mensaje.parte == 3):
-    videos_atendidos[mensaje.ip_cliente,mensaje.port_cliente]= mensaje.video
+  videos_atendidos[mensaje.ip_cliente,mensaje.port_cliente]= mensaje.video
 
 #------------------------------------------------------------------------------#
 
@@ -251,7 +246,7 @@ def escuchar_cliente():
 
         elif (mensaje.id == MENSAJE_MOSTRAR_VIDEO):
             
-            print("Se está enviando la lista de vídeos disponibles al cliente...")
+            print("- Se está enviando la lista de vídeos disponibles al cliente ",addr,"...")
             videos = Mensaje_lista_videos(videos_disponibles)
             data_string = pickle.dumps(videos)
             clientsocket.send(data_string)
@@ -261,7 +256,7 @@ def escuchar_cliente():
         elif (mensaje.id == MENSAJE_DESCARGA_VIDEO):
 
             if (mensaje.video in videos_disponibles):
-                print("Se está procesando un vídeo para un cliente...")
+                print("- Se está procesando un vídeo para un cliente ",addr,"...")
 
                 # Se abre un hilo para empezar a asignar tareas a los servidores
                 # de descarga.
@@ -327,7 +322,7 @@ def escuchar_servidor_descarga():
             enviar_ack = True
 
         elif (mensaje.id == MENSAJE_VIDEO_ATENDIDO):
-            print("Me llegó info del servidor de descarga.")
+            print("- Llegó información estadística del servidor de descarga: ",addr)
             log_video_atendido(mensaje)
             enviar_ack = True
 

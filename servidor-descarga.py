@@ -129,27 +129,11 @@ def inscribir_servidor_descarga():
     if (ack.id == mensaje.id and ack.type == "ack"):
         inscrito = True
         IP = ip
-        print("El servidor se ha inscrito de forma satisfactoria.")
+        print("- El servidor se ha inscrito de forma satisfactoria.")
 
     else:
-        print("El servidor no se ha podido inscribir. Intentelo de nuevo.")
+        print("- El servidor no se ha podido inscribir. Intentelo de nuevo.")
 
-
-#------------------------------------------------------------------------------#
-
-def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
-
-    '''
-        Descripción:
-    '''
-
-    
-    pass                                    
-
-    # Se lee el ACK
-    #mensaje_final = pickle.loads(msg)
-
-    #return mensaje_final
 
 #------------------------------------------------------------------------------#
 
@@ -203,9 +187,9 @@ def atender_cliente(ip,port,video,parte):
     # Se obtiene el ip de la maquina
     ip_sd = get_ip()
 
-    print("Video a enviar",video)
+    print("El siguiente vídeo fué asignado por el Servidor Central: ",video)
     # Se abre la lectura del archivo
-    video_a_enviar = open("./Video_1.mp4", "rb")
+    video_a_enviar = open(video, "rb")
     info_video = video_a_enviar.read(BUFFER)
 
     # Se crea el socket
@@ -234,31 +218,9 @@ def atender_cliente(ip,port,video,parte):
         #Leo el vídeo que debo eviar
         info_video = video_a_enviar.read(BUFFER)
 
-        #print("Estoy enviando un vídeo")
 
+    print("- Se terminó de enviar el vídeo",video,"al cliente",ip)
 
-    print("Terminé de enviar el vídeo")
-    #msg = sd_socket.recv(1024)
-    #sd_socket.close()
-
-    # Se lee el ACK
-    #mensaje_respuesta = pickle.loads(msg)
-
-    # Se recibe un ACK del cliente y se verifica si el mismo es correcto.
-    #if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
-    #    print("Se envio una parte del vídeo al cliente...")
-
-        # Se registra el vídeo atendido haciendo uso de semaforos.
-    #    mutex.acquire()
-    #    total_videos_descargando.discard(video)
-    #    total_videos_descargados.add(video)
-    #    mutex.release()
-
-        # Se ĺe informa al servidor que el vídeo ya fué enviado
-    #    ip,port,video,parte
-    #    mensaje = Mensaje_video_atendido(ip,port,video,parte)
-    #    ack = enviar_info(ip,PORT_ENVIO_SC,mensaje)
-    #    print("Se recibió ACK del SC",ack)
 
 #------------------------------------------------------------------------------#
 
@@ -294,7 +256,6 @@ def escuchar_sc():
         # Se recibe la información enviada por los SD.      
         data = clientsocket.recv(1024)
         mensaje = pickle.loads(data)
-        print("Mensaje",mensaje)
 
         if (mensaje.id == MENSAJE_ATENDER_VIDEO):
 
@@ -316,7 +277,7 @@ def escuchar_sc():
             #    ip,port,video,parte
             mensaje = Mensaje_video_atendido(mensaje.ip,mensaje.port,mensaje.video,0)
             ack = enviar_info(IP_SERVIDOR,PORT_ENVIO_SC,mensaje)
-            print("Se envió información estadística al Servidor Central...")
+            print("- Se envió información estadística al Servidor Central...")
         
         # Se envia un mensaje ACK al Servidor Central.
         if (enviar_ack):
@@ -333,7 +294,7 @@ def videos_descargando():
     '''
         Descripción:
     '''
-    print("Los vídeos que se están descargando son: ",total_videos_descargando)
+    print("- Los vídeos que se están descargando son: ",total_videos_descargando)
 
 #------------------------------------------------------------------------------#
 
@@ -342,7 +303,7 @@ def videos_descargados():
         Descripción:
     '''
 
-    print("Los vídeos descargandos son: ",total_videos_descargados)
+    print("- Los vídeos descargandos son: ",total_videos_descargados)
 
 #------------------------------------------------------------------------------#
 
