@@ -32,7 +32,7 @@ import modelo_db_sd
 #------------------------------------------------------------------------------#
 
 
-IP_SERVIDOR          = "192.168.1.7"
+IP_SERVIDOR          = "159.90.9.168"
 
 # Puerto para enviar info al Servidor Central
 PORT_ENVIO_SC          = 9998
@@ -207,41 +207,46 @@ def atender_cliente(ip,port,video,parte):
     
     video_solicitado = modelo_db_sd.Video.get(nombre=video)
 
-    # Se abre la lectura del archivo
-    video_a_enviar = open(video_solicitado.ubicacion_archivo, "rb")
-    info_video = video_a_enviar.read(BUFFER)
+    if (video_solicitado):
 
-    # Se crea el socket
-    sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    
-    try:
-        sd_socket.connect((ip,port))
-    except:
-        print("- No se pudo establecer una conexión.")
-        exit(0)
-    
-    video_size = os.stat(video_solicitado.ubicacion_archivo).st_size
-
-    # Armo el mensaje que va a ser enviado al cliente.
-    mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video_size,parte,video)
-    data_string = pickle.dumps(mensaje)
-    sd_socket.sendall(data_string)
-
-    ack = sd_socket.recv(1024)
-
-    # Se empieza a enviar el vídeo
-    while (info_video):
-        
-        # Se arma el mensaje que va a ser enviado al servidor.
-        sd_socket.sendall(info_video)
-
-        #Leo el vídeo que debo eviar
+        # Se abre la lectura del archivo
+        video_a_enviar = open(video_solicitado.ubicacion_archivo, "rb")
         info_video = video_a_enviar.read(BUFFER)
 
-        #print("Estoy enviando un vídeo")
+        # Se crea el socket
+        sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    print("- Se terminó de enviar el vídeo",video,"al cliente",ip)
+        
+        try:
+            sd_socket.connect((ip,port))
+        except:
+            print("- No se pudo establecer una conexión.")
+            exit(0)
+        
+        video_size = os.stat(video_solicitado.ubicacion_archivo).st_size
+
+        # Armo el mensaje que va a ser enviado al cliente.
+        mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video_size,parte,video)
+        data_string = pickle.dumps(mensaje)
+        sd_socket.sendall(data_string)
+
+        ack = sd_socket.recv(1024)
+
+        # Se empieza a enviar el vídeo
+        while (info_video):
+            
+            # Se arma el mensaje que va a ser enviado al servidor.
+            sd_socket.sendall(info_video)
+
+            #Leo el vídeo que debo eviar
+            info_video = video_a_enviar.read(BUFFER)
+
+            #print("Estoy enviando un vídeo")
+
+        print("- Se terminó de enviar el vídeo",video,"al cliente",ip)
+
+    else:
+        print("- El video no se encontró en la Base de Datos")
 
     #print("Terminé de enviar el vídeo")
     #msg = sd_socket.recv(1024)

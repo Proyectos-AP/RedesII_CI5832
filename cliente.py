@@ -39,7 +39,7 @@ videos_disponibles   = []
 PORT                 = 9999
 PORT_ESCUCHA         = 0
 IP                   = 0
-IP_SERVIDOR          = "192.168.1.7"
+IP_SERVIDOR          = "159.90.9.168"
 MENSAJE_ENVIAR_VIDEO = 12
 MENSAJE_LISTA_VIDEOS = 34
 
@@ -296,7 +296,7 @@ def enviar_ack_sd(id_mensaje,ip,port,video):
         
 
     # Se arma el mensaje que va a ser enviado al servidor.
-    mensaje = Mensaje_ack_sd(id_mensaje,IP,PORT,video,"ack")
+    mensaje = Mensaje_ack_sd(id_mensaje,IP,PORT_ESCUCHA,video,"ack")
     #mensaje = Mensaje_ack(id_mensaje,"ack",[IP,PORT,video])
     data_string = pickle.dumps(mensaje)
     client_socket.send(data_string)
