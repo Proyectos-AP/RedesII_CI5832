@@ -22,12 +22,15 @@ import socket
 import pickle 
 import modelo_db_sc
 import random
+import sys
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
 #------------------------------------------------------------------------------#
 
+clientes                = {}
 videos_disponibles      = set()
+servidores_descarga     = {}
 videos_atendidos        = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
@@ -55,7 +58,7 @@ def numero_descargas_video():
     '''
         Descripción:
     '''
-    print("El número de descargas realizadas es:",len(videos_atendidos))
+    print("- El número de descargas realizadas es:",len(videos_atendidos))
 
 #------------------------------------------------------------------------------#
 
@@ -65,7 +68,7 @@ def videos_cliente():
         Descripción:
     '''
 
-    print("Los vídeos atendidos son:")
+    print("- Los vídeos atendidos son:")
     print(videos_atendidos)
 
 
@@ -91,8 +94,8 @@ def enviar_video_cliente(ip,port,video):
         # Se espera a que el SD evíe el vídeo al cliente y envíe 
         # su confirmación
         #msg = sd_socket.recv(1024)
-        print("Recibido ACK del SD")
-        parte_video += 1
+        print("- Se le asignó el vídeo ",video,"al Servidor de Descarga",sd_server[0])
+
 
 
 #------------------------------------------------------------------------------#
@@ -105,12 +108,14 @@ def asignar_video_sd(ip_sd,port_sd,ip_cliente,port_cliente,video,parte):
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sd_socket.settimeout(8)
     
     # Conectamos el socket
     try:
         sd_socket.connect((ip_sd,port_sd))
     except:
         print("No se pudo establecer una conexón con el servidor descarga.")
+        sys.exit()
     
 
     # Se arma el mensaje que va a ser enviado al servidor.
@@ -153,6 +158,7 @@ def inscribir_sd(addr,videos):
         Descripción:
     '''
 
+
     global videos_disponibles
 
     videos_disponibles = videos_disponibles.union(set(videos))
@@ -174,7 +180,7 @@ def inscribir_sd(addr,videos):
     # for video in nuevo_sd.videos:
     #     print(video.nombre)
     print("VIDEOS DISPONIBLES",videos_disponibles)
-    print("Se ha inscrito el Servidor de descarga",nuevo_sd.direccion_ip, nuevo_sd.puerto)
+    print("Se ha inscrito el Servidor de descarga",servidores_descarga)
 
 #------------------------------------------------------------------------------#
 
@@ -213,6 +219,17 @@ def get_ip():
 
     return ip 
 
+
+#------------------------------------------------------------------------------#
+
+def log_video_atendido(mensaje):
+
+  '''
+      Descripción:
+  '''
+ 
+  # Se introduce el vídeo en el log del servidor
+  videos_atendidos[mensaje.ip_cliente,mensaje.port_cliente]= mensaje.video
 
 #------------------------------------------------------------------------------#
 
@@ -256,7 +273,7 @@ def escuchar_cliente():
 
         elif (mensaje.id == MENSAJE_MOSTRAR_VIDEO):
             
-            print("Se está enviando la lista de vídeos disponibles al cliente...")
+            print("- Se está enviando la lista de vídeos disponibles al cliente ",addr,"...")
 
 
             # Se obtiene la lista de videos disponibles de la BD
@@ -320,7 +337,7 @@ def escuchar_cliente():
                 print("No se encontro")
 
             if (mensaje.video in videos_disponibles):
-                print("Se está procesando un vídeo para un cliente...")
+                print("- Se está procesando un vídeo para un cliente ",addr,"...")
 
                 # Se abre un hilo para empezar a asignar tareas a los servidores
                 # de descarga.
@@ -386,8 +403,8 @@ def escuchar_servidor_descarga():
             enviar_ack = True
 
         elif (mensaje.id == MENSAJE_VIDEO_ATENDIDO):
-            print("Me llegó info del servidor de descarga.")
-            #log_video_atendido(mensaje)
+            print("- Llegó información estadística del servidor de descarga: ",addr)
+            log_video_atendido(mensaje)
             enviar_ack = True
 
 

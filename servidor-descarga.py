@@ -96,6 +96,7 @@ def inscribir_servidor_descarga():
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sd_socket.settimeout(8)
 
     # Se obtiene el hostname de la maquina
     ip = get_ip()
@@ -126,10 +127,10 @@ def inscribir_servidor_descarga():
     if (ack.id == mensaje.id and ack.type == "ack"):
         inscrito = True
         IP = ip
-        print("El servidor se ha inscrito de forma satisfactoria.")
+        print("- El servidor se ha inscrito de forma satisfactoria.")
 
     else:
-        print("El servidor no se ha podido inscribir. Intentelo de nuevo.")
+        print("- El servidor no se ha podido inscribir. Intentelo de nuevo.")
 
 
 #------------------------------------------------------------------------------#
@@ -159,6 +160,7 @@ def enviar_info(ip_cliente,port_cliente,mensaje):
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sd_socket.settimeout(8)
 
     
     try:
@@ -184,11 +186,7 @@ def enviar_info(ip_cliente,port_cliente,mensaje):
 
 #------------------------------------------------------------------------------#
 
-@db_session
 def atender_cliente(ip,port,video,parte):
-    '''
-        Descripción: Se atiende la solicitud del cliente
-    '''
 
     global mutex
     global total_videos_descargando
@@ -229,6 +227,8 @@ def atender_cliente(ip,port,video,parte):
     data_string = pickle.dumps(mensaje)
     sd_socket.sendall(data_string)
 
+    ack = sd_socket.recv(1024)
+
     # Se empieza a enviar el vídeo
     while (info_video):
         
@@ -240,6 +240,7 @@ def atender_cliente(ip,port,video,parte):
 
         #print("Estoy enviando un vídeo")
 
+    print("- Se terminó de enviar el vídeo",video,"al cliente",ip)
 
     print("Terminé de enviar el vídeo")
     #msg = sd_socket.recv(1024)
@@ -337,7 +338,7 @@ def videos_descargando():
     '''
         Descripción: Se muestra el total de videos descargando
     '''
-    print("Los vídeos que se están descargando son: ",total_videos_descargando)
+    print("- Los vídeos que se están descargando son: ",total_videos_descargando)
 
 #------------------------------------------------------------------------------#
 
@@ -346,7 +347,7 @@ def videos_descargados():
         Descripción: Se muestra el total de videos descargados
     '''
 
-    print("Los vídeos descargandos son: ",total_videos_descargados)
+    print("- Los vídeos descargandos son: ",total_videos_descargados)
 
 #------------------------------------------------------------------------------#
 

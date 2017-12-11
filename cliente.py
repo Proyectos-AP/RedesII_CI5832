@@ -132,10 +132,10 @@ def inscribir_cliente(ip,port):
         if (ack.id == mensaje.id and ack.type == "ack"):
             inscrito = True
             IP = ip
-            print("El cliente se ha inscrito de forma satisfactoria")
+            print("- El cliente se ha inscrito de forma satisfactoria")
 
         else:
-            print("El cliente no se ha podido inscribir. Intentelo de nuevo.")
+            print("- El cliente no se ha podido inscribir. Intentelo de nuevo.")
 
     else: 
         print(error_ya_inscrito)
@@ -193,7 +193,7 @@ def video(nombre_video):
             #escuchar_servidor_descarga()
 
         elif (ack.id == mensaje.id and ack.type == "nack"):
-            print("El vídeo introducido no se encuentra en la lista de vídeos disponibles.")
+            print("- El vídeo introducido no se encuentra en la lista de vídeos disponibles.")
 
         else:
             print("El cliente no se ha podido hacer la petición al servidor. Intentelo de nuevo.")
@@ -218,7 +218,8 @@ def escuchar_servidor_descarga():
     try:
         serversocket.bind((IP, PORT_ESCUCHA))
     except:
-        print("No se pudo establecer una conexón con el servidor central.")                                  
+        print("No se pudo abrir el socket para recibir vídeos.")                                  
+        sys.exit()
 
     # queue up to 5 requests
     serversocket.listen(5) 
@@ -229,10 +230,15 @@ def escuchar_servidor_descarga():
 
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()
+        clientsocket.settimeout(5)
 
         # Se recibe la información enviada por los SD.      
-        data = clientsocket.recv(4096)
+        data = clientsocket.recv(8192)
         mensaje = pickle.loads(data)
+
+        ack = Mensaje_ack(mensaje.id,"ack")
+        data_string = pickle.dumps(ack)
+        clientsocket.send(data_string)
 
 
         if (mensaje.id  == MENSAJE_ENVIAR_VIDEO):
@@ -257,7 +263,7 @@ def escuchar_servidor_descarga():
             #clientsocket.close()
             video_recibido.close()
             clientsocket.close()
-            print("Se recibió el vídeo ",mensaje.nombre_video)
+            print("- Se recibió el vídeo ",mensaje.nombre_video)
 
             enviar_ack_sd(mensaje.id,mensaje.ip,mensaje.port,mensaje.nombre_video)
 
@@ -279,12 +285,14 @@ def enviar_ack_sd(id_mensaje,ip,port,video):
 
     # Se crea el socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.settimeout(5)
         
     # Conectamos el socket
     try:
         client_socket.connect((ip, port))
     except:
-        print("No se pudo establecer una conexón con el servidor central.")
+        print("No se pudo establecer una conexón con el Servidor de Descarga.")
+        sys.exit()
         
 
     # Se arma el mensaje que va a ser enviado al servidor.
