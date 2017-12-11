@@ -296,7 +296,7 @@ def enviar_ack_sd(id_mensaje,ip,port,video):
         
 
     # Se arma el mensaje que va a ser enviado al servidor.
-    mensaje = Mensaje_ack_sd(id_mensaje,IP,PORT,video,"ack")
+    mensaje = Mensaje_ack_sd(id_mensaje,IP,PORT_ESCUCHA,video,"ack")
     #mensaje = Mensaje_ack(id_mensaje,"ack",[IP,PORT,video])
     data_string = pickle.dumps(mensaje)
     client_socket.send(data_string)
