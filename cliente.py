@@ -20,6 +20,7 @@ import _thread
 import socket
 import pickle 
 import re
+import sys
 import os
 
 #------------------------------------------------------------------------------#
@@ -79,12 +80,14 @@ def enviar_info(ip,port,mensaje):
 
     # Se crea el socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.settimeout(5)
         
     # Conectamos el socket
     try:
         client_socket.connect((ip, port))
     except:
-        print("No se pudo establecer una conexón con el servidor central.")
+        print("Error: No se pudo establecer una conexión con el servidor central.")
+        sys.exit()
         
 
     # Se arma el mensaje que va a ser enviado al servidor.
@@ -348,10 +351,19 @@ def consola():
 
 
 #------------------------------------------------------------------------------#
+
+def verificar_servidor_central():
+
+    # Se envia un mensaje al servidor central
+    mensaje = Mensaje_ack(20,"ping","probando_conexion")
+    ack = enviar_info(IP_SERVIDOR,PORT,mensaje)
+
+#------------------------------------------------------------------------------#
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
 # Se verifica si el Servidor Central está activo.
+verificar_servidor_central()
 
 # Se muestra la consola al cliente
 consola()

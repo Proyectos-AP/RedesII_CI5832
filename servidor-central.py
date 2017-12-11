@@ -31,6 +31,7 @@ servidores_descarga     = {}
 videos_atendidos        = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
+MENSAJE_PING            = 20
 MENSAJE_INSCRIPCION     = 21
 MENSAJE_MOSTRAR_VIDEO   = 22
 MENSAJE_DESCARGA_VIDEO  = 23
@@ -241,7 +242,10 @@ def escuchar_cliente():
         data = clientsocket.recv(1024)
         mensaje = pickle.loads(data)
 
-        if (mensaje.id == MENSAJE_INSCRIPCION):
+        if (mensaje.id == MENSAJE_PING):
+            enviar_ack = True 
+
+        elif (mensaje.id == MENSAJE_INSCRIPCION):
             inscribir_cliente([mensaje.ip,mensaje.port])
             enviar_ack = True
 
@@ -314,8 +318,10 @@ def escuchar_servidor_descarga():
         data = clientsocket.recv(4096)
         mensaje = pickle.loads(data)
 
+        if (mensaje.id == MENSAJE_PING):
+            enviar_ack = True 
 
-        if (mensaje.id  == MENSAJE_INSCRIPCION_SD):
+        elif (mensaje.id  == MENSAJE_INSCRIPCION_SD):
             # Se almacena la información recibida
             inscribir_sd([mensaje.ip,mensaje.port],mensaje.videos)
             enviar_ack = True
