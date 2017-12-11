@@ -128,7 +128,7 @@ def enviar_video_cliente(ip,port,video):
     '''
         Descripción:
     '''
-
+    global servidores_descarga
     lista_sd_activos = verificar_sd(servidores_descarga)
 
     if (len (lista_sd_activos) > 0):
