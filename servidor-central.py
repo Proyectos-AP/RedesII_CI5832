@@ -170,10 +170,16 @@ def inscribir_sd(addr,videos):
 
     # Se agregan los videos disponibles del servidor de descarga en la BD
     for video in videos:
-        nuevo_video = modelo_db_sc.Video(nombre=video)
-        # Se relaciona el video disponile con el servidor de descarga
-        nuevo_sd.videos += nuevo_video
-        commit()
+
+        verif_video = modelo_db_sc.Video.get(nombre=video)
+
+        if (!verif_video):
+            nuevo_video = modelo_db_sc.Video(nombre=video)
+            # Se relaciona el video disponile con el servidor de descarga
+            nuevo_sd.videos += nuevo_video
+            commit()
+        else:
+            pass
 
     # - testing -
     # for video in nuevo_sd.videos:
