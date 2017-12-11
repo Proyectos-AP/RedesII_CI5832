@@ -21,6 +21,7 @@ import socket
 import pickle 
 import re
 import sys
+import os
 
 #------------------------------------------------------------------------------#
 #                                   NOTAS                                      #
@@ -220,10 +221,8 @@ def escuchar_servidor_descarga():
         print("No se pudo establecer una conexón con el servidor central.")                                  
 
     # queue up to 5 requests
-    serversocket.listen(3) 
-    numero_videos = 0
+    serversocket.listen(5) 
 
-    print("---- Se abrió socket para escuchar a Servidor de Descarga -----")
     while (True):
 
         enviar_ack = False
@@ -239,10 +238,28 @@ def escuchar_servidor_descarga():
         if (mensaje.id  == MENSAJE_ENVIAR_VIDEO):
 
             # Se reciben las partes del vídeo
-            print("Recibida parte",numero_videos)
-            enviar_ack = True
-            numero_videos += 1
+            #enviar_ack = True
+            
+            video_recibido = open(mensaje.nombre_video+str(2), "wb")
 
+            # Se empieza a recibir streaming de vídeo
+            while True:
+
+                data = clientsocket.recv(1024)
+
+                if not(data):
+                    video_recibido.close()
+                    break
+
+                video_recibido.write(data)
+
+            
+            #clientsocket.close()
+            video_recibido.close()
+            clientsocket.close()
+            print("Se recibió el vídeo ",mensaje.nombre_video)
+
+            enviar_ack_sd(mensaje.id,mensaje.ip,mensaje.port,mensaje.nombre_video)
 
         # Se envia un mensaje ACK al cliente.
         if (enviar_ack):
@@ -251,9 +268,33 @@ def escuchar_servidor_descarga():
             clientsocket.send(data_string)
             clientsocket.close()
 
-        if (numero_videos > 2):
-            print("Se recibió el vídeo completo")
-            numero_videos = 0
+#------------------------------------------------------------------------------#
+
+def enviar_ack_sd(id_mensaje,ip,port,video):
+
+
+    '''
+        Descripción:
+    '''
+
+    # Se crea el socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+    # Conectamos el socket
+    try:
+        client_socket.connect((ip, port))
+    except:
+        print("No se pudo establecer una conexón con el servidor central.")
+        
+
+    # Se arma el mensaje que va a ser enviado al servidor.
+    mensaje = Mensaje_ack_sd(id_mensaje,IP,PORT,video,"ack")
+    #mensaje = Mensaje_ack(id_mensaje,"ack",[IP,PORT,video])
+    data_string = pickle.dumps(mensaje)
+    client_socket.send(data_string)
+                         
+    # Se cierra el socket
+    client_socket.close()
 
 #------------------------------------------------------------------------------#
 
