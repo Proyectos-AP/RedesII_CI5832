@@ -40,6 +40,8 @@ PORT_ENVIO_SC          = 9998
 # Puerto para recibir info del Servidor Central
 PORT_ESCUCHA_SC        = 0
 
+MENSAJE_PING            = 20
+
 MENSAJE_ATENDER_VIDEO  = 32
 
 MENSAJE_ENVIAR_VIDEO   = 12
@@ -306,6 +308,9 @@ def escuchar_sc():
         data = clientsocket.recv(1024)
         mensaje = pickle.loads(data)
         #print("Mensaje",mensaje)
+
+        if (mensaje.id == MENSAJE_PING):
+            enviar_ack = True 
 
         if (mensaje.id == MENSAJE_ATENDER_VIDEO):
 

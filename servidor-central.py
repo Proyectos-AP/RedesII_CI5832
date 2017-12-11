@@ -113,6 +113,9 @@ def verificar_servidor_descarga(ip,port):
         data_string = pickle.dumps(mensaje)
         sd_socket.send(data_string)
 
+        # Se espera el ACK
+        ack = sd_socket.recv(1024)
+
         # Se cierra el socket
         sd_socket.close()
         return True
