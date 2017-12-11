@@ -42,10 +42,10 @@ MENSAJE_ATENDER_VIDEO  = 32
 MENSAJE_ENVIAR_VIDEO   = 12
 
 videos_disponibles = [
-    "La_Divaza_En_Mexico",
-    "How_To_Flirt",
-    "Frozen_iPhone",
-    "Tove_Lo_Habits",
+    "La_Divaza_En_Mexico.mp4",
+    "How_To_Flirt.mp4",
+    "Frozen_iPhone.mp4",
+    "Tove_Lo_Habits.mp4",
     "Video_1.mp4"
 ]
 
