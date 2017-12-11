@@ -28,7 +28,6 @@ import random
 #------------------------------------------------------------------------------#
 
 videos_disponibles      = set()
-servidores_descarga     = {}
 videos_atendidos        = {}
 PORT_CLIENTE            = 9999
 PORT_SERVIDOR_DESCARGA  = 9998 
@@ -154,10 +153,8 @@ def inscribir_sd(addr,videos):
         Descripción:
     '''
 
-    global servidores_descarga
     global videos_disponibles
 
-    servidores_descarga[addr[0],addr[1]] = videos
     videos_disponibles = videos_disponibles.union(set(videos))
 
     # Se crea el servidor de descarga en la BD
@@ -177,7 +174,7 @@ def inscribir_sd(addr,videos):
     # for video in nuevo_sd.videos:
     #     print(video.nombre)
     print("VIDEOS DISPONIBLES",videos_disponibles)
-    print("Se ha inscrito el Servidor de descarga",servidores_descarga)
+    print("Se ha inscrito el Servidor de descarga",nuevo_sd.direccion_ip, nuevo_sd.puerto)
 
 #------------------------------------------------------------------------------#
 
