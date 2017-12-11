@@ -34,23 +34,21 @@ class Video(db.Entity):
 #								CREANDO LOS MODELOS 						   #
 #------------------------------------------------------------------------------#
 
-servidor_seleccionado = sys.argv[1]
-numero_servidor = int(servidor_seleccionado)
-
 db.bind(provider='postgres', 
         user='sistemavideo', 
         password='123123', 
         host='localhost', 
-        database='servidordescarga' + servidor_seleccionado)
+        database='servidordescarga1')
 
 db.generate_mapping(create_tables=True)
 
-inicio = 10 * numero_servidor
+# Para poblar las cosas
+# inicio = 10 * numero_servidor
 
-with db_session:
-	for i in range(inicio,inicio + 10):
-		nuevo_video = Video(nombre="Video_"+str(i), 
-							ubicacion_archivo="./Video_1.mp4",
-							numero_descargas=0)
-		commit()
+# with db_session:
+# 	for i in range(inicio,inicio + 10 ):
+# 		nuevo_video = Video(nombre="Video_"+str(i), 
+# 							ubicacion_archivo="./Video_1.mp4",
+# 							numero_descargas=0)
+# 		commit()
 

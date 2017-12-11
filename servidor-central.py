@@ -17,6 +17,7 @@
 
 import _thread
 from mensajes_cli_sc import *
+from pony.orm import *
 import socket
 import pickle 
 

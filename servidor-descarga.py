@@ -12,23 +12,26 @@
 
 '''
 
-
 #------------------------------------------------------------------------------#
 #                                   IMPORTES                                   #
 #------------------------------------------------------------------------------#
 
 from mensajes_cli_sc import *
+from pony.orm import *
 import socket
 import pickle 
 from threading import Thread, Lock
 import random
+import sys
+import modelo_db_sd
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
 #------------------------------------------------------------------------------#
 
+videos_disponibles = []
 
-IP_SERVIDOR          = "192.168.0.106"
+IP_SERVIDOR          = "192.168.1.7"
 
 # Puerto para enviar info al Servidor Central
 PORT_ENVIO_SC          = 9998
@@ -37,13 +40,6 @@ PORT_ENVIO_SC          = 9998
 PORT_ESCUCHA_SC        = 0
 
 MENSAJE_ATENDER_VIDEO  = 32
-
-videos_disponibles = [
-    "La_Divaza_En_Mexico",
-    "How_To_Flirt",
-    "Frozen_iPhone",
-    "Tove_Lo_Habits",
-]
 
 total_videos_descargando = set()
 total_videos_descargados = set()
@@ -56,7 +52,7 @@ mutex = Lock()
 
 def iniciar_servidor():
     '''
-        Descripción:
+        Descripción: Inicializa el servidor de descarga de videos
     '''
     
     global PORT_ESCUCHA_SC
@@ -75,7 +71,7 @@ def iniciar_servidor():
 def get_ip():
 
     '''
-        Descripción:
+        Descripción: Se obtiene la dirección IP del servidor de descarga
     '''
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -90,7 +86,8 @@ def get_ip():
 
 def inscribir_servidor_descarga():
     '''
-        Descripción:
+        Descripción: Se inscribe el servidor de descarga con el servidor 
+        central
     '''
 
     # Se crea el socket
@@ -136,7 +133,7 @@ def inscribir_servidor_descarga():
 def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
 
     '''
-        Descripción:
+        Descripción: Se envia un video al cliente
     '''
 
     # Se crea el socket
@@ -167,6 +164,9 @@ def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
 #------------------------------------------------------------------------------#
 
 def atender_cliente(ip,port,video,parte):
+    '''
+        Descripción: Se atiende la solicitud del cliente
+    '''
 
     global mutex
     global total_videos_descargando
@@ -208,7 +208,7 @@ def atender_cliente(ip,port,video,parte):
 def escuchar_sc():
 
     '''
-        Descripción:
+        Descripción: Se escucha al servidor central
     '''
 
     # Se crea el socket
@@ -259,7 +259,7 @@ def escuchar_sc():
 
 def videos_descargando():
     '''
-        Descripción:
+        Descripción: Se muestra el total de videos descargando
     '''
     print("Los vídeos que se están descargando son: ",total_videos_descargando)
 
@@ -267,7 +267,7 @@ def videos_descargando():
 
 def videos_descargados():
     '''
-        Descripción:
+        Descripción: Se muestra el total de videos descargados
     '''
 
     print("Los vídeos descargandos son: ",total_videos_descargados)
@@ -275,6 +275,9 @@ def videos_descargados():
 #------------------------------------------------------------------------------#
 
 def consola():
+    '''
+        Descripción: Menu de la aplicacion
+    '''
 
     print("---- SERVIDOR DESCARGA -----")
 
@@ -297,6 +300,10 @@ def consola():
 #------------------------------------------------------------------------------#
 
 def verificar_servidor_central():
+    '''
+        Descripción: Al inicio, se verifica que el Servidor Central
+        esté en línea
+    '''
 
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -331,6 +338,12 @@ def verificar_servidor_central():
 #                        INICIO DEL CÓDIGO PRINCIPAL                           #
 #------------------------------------------------------------------------------#
 
+# Se consulta en la BD los videos disponibles
+with db_session:
+    videos_bd = modelo_db_sd.Video.select()
+
+    for video in videos_bd:
+        videos_disponibles.append(video.nombre) 
 
 # Verificar si el SC está conectado.
 verificar_servidor_central()
