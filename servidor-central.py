@@ -173,7 +173,7 @@ def inscribir_sd(addr,videos):
 
         verif_video = modelo_db_sc.Video.get(nombre=video)
 
-        if (!verif_video):
+        if (not(verif_video)):
             nuevo_video = modelo_db_sc.Video(nombre=video)
             # Se relaciona el video disponile con el servidor de descarga
             nuevo_sd.videos += nuevo_video
