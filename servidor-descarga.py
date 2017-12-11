@@ -236,23 +236,27 @@ def atender_cliente(ip,port,video,parte):
 
 
     print("Terminé de enviar el vídeo")
-    sd_socket.close()
+    #msg = sd_socket.recv(1024)
+    #sd_socket.close()
+
+    # Se lee el ACK
+    #mensaje_respuesta = pickle.loads(msg)
 
     # Se recibe un ACK del cliente y se verifica si el mismo es correcto.
-    if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
-        print("Se envio una parte del vídeo al cliente...")
+    #if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
+    #    print("Se envio una parte del vídeo al cliente...")
 
         # Se registra el vídeo atendido haciendo uso de semaforos.
-        mutex.acquire()
-        total_videos_descargando.discard(video)
-        total_videos_descargados.add(video)
-        mutex.release()
+    #    mutex.acquire()
+    #    total_videos_descargando.discard(video)
+    #    total_videos_descargados.add(video)
+    #    mutex.release()
 
         # Se ĺe informa al servidor que el vídeo ya fué enviado
-        ip,port,video,parte
-        mensaje = Mensaje_video_atendido(ip,port,video,parte)
-        ack = enviar_info(ip,PORT_ENVIO_SC,mensaje)
-        print("Se recibió ACK del SC",ack)
+    #    ip,port,video,parte
+    #    mensaje = Mensaje_video_atendido(ip,port,video,parte)
+    #    ack = enviar_info(ip,PORT_ENVIO_SC,mensaje)
+    #    print("Se recibió ACK del SC",ack)
 
 #------------------------------------------------------------------------------#
 

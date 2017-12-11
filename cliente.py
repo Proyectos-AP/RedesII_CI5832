@@ -20,6 +20,7 @@ import _thread
 import socket
 import pickle 
 import re
+import os
 
 #------------------------------------------------------------------------------#
 #                                   NOTAS                                      #
@@ -249,9 +250,12 @@ def escuchar_servidor_descarga():
 
                 video_recibido.write(data)
 
-            print("Se recibió todo el vídeo")
-            clientsocket.close()
+            
+            #clientsocket.close()
             video_recibido.close()
+            print("Se recibió el vídeo ",mensaje.nombre_video)
+            enviar_ack = True
+            
 
         # Se envia un mensaje ACK al cliente.
         if (enviar_ack):
