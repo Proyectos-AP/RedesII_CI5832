@@ -241,7 +241,7 @@ def escuchar_servidor_descarga():
             # Se reciben las partes del vídeo
             #enviar_ack = True
             
-            video_recibido = open("hola", "wb")
+            video_recibido = open(str(mensaje.nombre_video)+str(2), "wb")
 
             # Se empieza a recibir streaming de vídeo
             while True:

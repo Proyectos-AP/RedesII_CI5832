@@ -187,9 +187,10 @@ def atender_cliente(ip,port,video,parte):
     # Se obtiene el ip de la maquina
     ip_sd = get_ip()
 
-    print("El siguiente vídeo fué asignado por el Servidor Central: ",video)
+    path_video = "./"+str(video)
+    print("El siguiente vídeo fué asignado por el Servidor Central: ",path_video)
     # Se abre la lectura del archivo
-    video_a_enviar = open(video, "rb")
+    video_a_enviar = open(path_video, "rb")
     info_video = video_a_enviar.read(BUFFER)
 
     # Se crea el socket
