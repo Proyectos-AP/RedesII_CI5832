@@ -20,6 +20,7 @@ from mensajes_cli_sc import *
 from pony.orm import *
 import socket
 import pickle 
+import modelo_db_sc
 import random
 
 #------------------------------------------------------------------------------#
@@ -130,6 +131,8 @@ def asignar_video_sd(ip_sd,port_sd,ip_cliente,port_cliente,video,parte):
     return mensaje_final,sd_socket
 
 #------------------------------------------------------------------------------#
+
+@db_session
 def inscribir_cliente(addr):
 
     '''
@@ -140,11 +143,17 @@ def inscribir_cliente(addr):
 
     clientes[addr[0],addr[1]] = ""
 
+    # Se crea el cliente en la BD
+    nuevo_cliente = modelo_db_sc.Cliente(direccion_ip=addr[0], 
+                                        puerto=(addr[1]))
+    commit()
+
     print("Se ha inscrito el cliente",addr)
 
 
 #------------------------------------------------------------------------------#
 
+@db_session
 def inscribir_sd(addr,videos):
 
     '''
@@ -157,6 +166,22 @@ def inscribir_sd(addr,videos):
     servidores_descarga[addr[0],addr[1]] = videos
     videos_disponibles = videos_disponibles.union(set(videos))
 
+    # Se crea el servidor de descarga en la BD
+    nuevo_sd = modelo_db_sc.ServidorDescarga(direccion_ip=addr[0], 
+                                            puerto=addr[1],
+                                            estado="1")
+    commit()
+
+    # Se agregan los videos disponibles del servidor de descarga en la BD
+    for video in videos:
+        nuevo_video = modelo_db_sc.Video(nombre=video)
+        # Se relaciona el video disponile con el servidor de descarga
+        nuevo_sd.videos += nuevo_video
+        commit()
+
+    # - testing -
+    # for video in nuevo_sd.videos:
+    #     print(video.nombre)
     print("VIDEOS DISPONIBLES",videos_disponibles)
     print("Se ha inscrito el Servidor de descarga",servidores_descarga)
 
@@ -200,19 +225,7 @@ def get_ip():
 
 #------------------------------------------------------------------------------#
 
-def log_video_atendido(mensaje):
-
-  '''
-      Descripción:
-  '''
-  print("Parte del vídeo atendido",mensaje.parte)
-
-  # Se introduce el vídeo en el log del servidor
-  if (mensaje.parte == 3):
-    videos_atendidos[mensaje.ip_cliente,mensaje.port_cliente]= mensaje.video
-
-#------------------------------------------------------------------------------#
-
+@db_session
 def escuchar_cliente():
 
     '''
@@ -253,6 +266,16 @@ def escuchar_cliente():
         elif (mensaje.id == MENSAJE_MOSTRAR_VIDEO):
             
             print("Se está enviando la lista de vídeos disponibles al cliente...")
+
+
+            # Se obtiene la lista de videos disponibles de la BD
+            videos_disponibles_bd = modelo_db_sc.Video.select()            
+
+            # - Testing -
+            # print("-- Videos BD --")
+            # for video in videos_disponibles_bd:
+            #     print(video.nombre)
+
             videos = Mensaje_lista_videos(videos_disponibles)
             data_string = pickle.dumps(videos)
             clientsocket.send(data_string)
@@ -260,6 +283,50 @@ def escuchar_cliente():
             enviar_ack = False
 
         elif (mensaje.id == MENSAJE_DESCARGA_VIDEO):
+
+            # Se verifican cuantas descargas hay en el momento
+            numero_descargas_actuales = len(modelo_db_sc.Descarga.select(
+                                                lambda p: p.parte_actual < 4))
+
+            # Testing
+            print("El numero actual de descargas es --> " + 
+                                                str(numero_descargas_actuales))
+
+            if numero_descargas_actuales > 5:
+                # Se debe crear una solicitud de descarga y 
+                # poner al cliente en espera   
+                pass        
+            else: 
+                # Se crea la descarga normal
+                pass
+
+            # Se busca el video solicitado en la BD (caso descarga posible)
+            video_solicitado = modelo_db_sc.Video.get(nombre=mensaje.video)
+
+            if video_solicitado:
+
+                print("Se encontro en la BD")
+
+                # Se obtiene la entidad del cliente
+                cliente_actual = modelo_db_sc.Cliente.get(direccion_ip=mensaje.ip)
+
+                # Se crea la solicitud de la descarga 
+
+                nueva_descarga = modelo_db_sc.Descarga(
+                                                    cliente=cliente_actual,
+                                                    video=video_solicitado,
+                                                    parte_actual=1,
+                                                )
+                commit()
+
+                # Se envia el video
+
+                # Se actualiza el estado de la descgarga una vez que el video 
+                # ha sido enviado en sus tres partes
+                nueva_descarga.parte_actual = 4
+
+            else:
+                print("No se encontro")
 
             if (mensaje.video in videos_disponibles):
                 print("Se está procesando un vídeo para un cliente...")
@@ -329,7 +396,7 @@ def escuchar_servidor_descarga():
 
         elif (mensaje.id == MENSAJE_VIDEO_ATENDIDO):
             print("Me llegó info del servidor de descarga.")
-            log_video_atendido(mensaje)
+            #log_video_atendido(mensaje)
             enviar_ack = True
 
 
