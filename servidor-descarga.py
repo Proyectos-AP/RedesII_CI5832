@@ -22,6 +22,7 @@ import socket
 import pickle 
 from threading import Thread, Lock
 import random
+import os
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
@@ -43,6 +44,7 @@ videos_disponibles = [
     "How_To_Flirt",
     "Frozen_iPhone",
     "Tove_Lo_Habits",
+    "Video_1.mp4"
 ]
 
 total_videos_descargando = set()
@@ -139,6 +141,23 @@ def enviar_video_cliente(ip_cliente,port_cliente,mensaje):
         Descripción:
     '''
 
+    
+    pass                                    
+
+    # Se lee el ACK
+    #mensaje_final = pickle.loads(msg)
+
+    #return mensaje_final
+
+#------------------------------------------------------------------------------#
+
+
+def enviar_info(ip_cliente,port_cliente,mensaje):
+
+    '''
+        Descripción:
+    '''
+
     # Se crea el socket
     sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -171,6 +190,7 @@ def atender_cliente(ip,port,video,parte):
     global mutex
     global total_videos_descargando
     global total_videos_descargados
+    BUFFER = 1024
 
     # Se registra el vídeo que se esta descargando haciendo uso de semaforos.
     mutex.acquire()
@@ -181,11 +201,42 @@ def atender_cliente(ip,port,video,parte):
     # Se obtiene el ip de la maquina
     ip_sd = get_ip()
 
-    # Armo el mensaje que va a ser enviado al cliente.
-    mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video,parte)
+    print("Video a enviar",video)
+    # Se abre la lectura del archivo
+    video_a_enviar = open("./Video_1.mp4", "rb")
+    info_video = video_a_enviar.read(BUFFER)
 
-    # Envio el mensaje al cliente.
-    mensaje_respuesta = enviar_video_cliente(ip,port,mensaje)
+    # Se crea el socket
+    sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    
+    try:
+        sd_socket.connect((ip,port))
+    except:
+        print("No se pudo establecer una conexión.")
+        exit(0)
+    
+    video_size = os.stat(video).st_size
+
+    # Armo el mensaje que va a ser enviado al cliente.
+    #mensaje = Mensaje_enviar_video(ip_sd,PORT_ESCUCHA_SC,video_size,parte,video)
+    #data_string = pickle.dumps(mensaje)
+    #sd_socket.sendall(data_string)
+
+    # Se empieza a enviar el vídeo
+    while (info_video):
+        
+        # Se arma el mensaje que va a ser enviado al servidor.
+        sd_socket.sendall(info_video)
+
+        #Leo el vídeo que debo eviar
+        info_video = video_a_enviar.read(BUFFER)
+
+        #print("Estoy enviando un vídeo")
+
+
+    print("Terminé de enviar el vídeo")
+    sd_socket.close()
 
     # Se recibe un ACK del cliente y se verifica si el mismo es correcto.
     if (mensaje_respuesta.id  == mensaje.id and mensaje_respuesta.type == "ack"):
@@ -200,7 +251,7 @@ def atender_cliente(ip,port,video,parte):
         # Se ĺe informa al servidor que el vídeo ya fué enviado
         ip,port,video,parte
         mensaje = Mensaje_video_atendido(ip,port,video,parte)
-        ack = enviar_video_cliente(ip,PORT_ENVIO_SC,mensaje)
+        ack = enviar_info(ip,PORT_ENVIO_SC,mensaje)
         print("Se recibió ACK del SC",ack)
 
 #------------------------------------------------------------------------------#

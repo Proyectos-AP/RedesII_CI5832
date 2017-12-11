@@ -19,6 +19,7 @@ import _thread
 from mensajes_cli_sc import *
 import socket
 import pickle 
+import random
 
 #------------------------------------------------------------------------------#
 #                            VARIABLES GLOBALES                                #
@@ -77,20 +78,20 @@ def enviar_video_cliente(ip,port,video):
 
     parte_video = 1
 
-    for server in servidores_descarga:
+    sd_server, sd_videos = random.choice(list(servidores_descarga.items()))
 
-        mensaje_recibido, sd_socket = asignar_video_sd(server[0],server[1],ip,port,video,parte_video)
+    mensaje_recibido, sd_socket = asignar_video_sd(sd_server[0],sd_server[1],ip,port,video,0)
 
-        # Se recibe el ACK del Servidor de Descarga.
-        print("Mensaje recibido",mensaje_recibido.id,mensaje_recibido.type)
+    # Se recibe el ACK del Servidor de Descarga.
+    print("Mensaje recibido",mensaje_recibido.id,mensaje_recibido.type)
 
-        if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
+    if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
 
-            # Se espera a que el SD evíe el vídeo al cliente y envíe 
-            # su confirmación
-            #msg = sd_socket.recv(1024)
-            print("Recibido ACK del SD")
-            parte_video += 1
+        # Se espera a que el SD evíe el vídeo al cliente y envíe 
+        # su confirmación
+        #msg = sd_socket.recv(1024)
+        print("Recibido ACK del SD")
+        parte_video += 1
 
 
 #------------------------------------------------------------------------------#

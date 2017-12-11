@@ -217,41 +217,33 @@ def escuchar_servidor_descarga():
         print("No se pudo establecer una conexón con el servidor central.")                                  
 
     # queue up to 5 requests
-    serversocket.listen(3) 
-    numero_videos = 0
+    serversocket.listen(5) 
 
-    print("---- Se abrió socket para escuchar a Servidor de Descarga -----")
-    while (True):
-
-        enviar_ack = False
+    
+    while True:
 
         # Se establece la conexion
         clientsocket,addr = serversocket.accept()
 
-        # Se recibe la información enviada por los SD.      
-        data = clientsocket.recv(4096)
-        mensaje = pickle.loads(data)
 
+        while True:
 
-        if (mensaje.id  == MENSAJE_ENVIAR_VIDEO):
+            video_recibido = open("./video_recibido.mp4", "ab")
+            # Se recibe el vídeo      
+            buffer_recibido = clientsocket.recv(1024)
 
-            # Se reciben las partes del vídeo
-            print("Recibida parte",numero_videos)
-            enviar_ack = True
-            numero_videos += 1
+            if not(buffer_recibido):
+                video_recibido.close()
+                break
 
+            # Se escribe en el archivo del vídeo
+            video_recibido.write(buffer_recibido)
+            video_recibido.close()
 
-        # Se envia un mensaje ACK al cliente.
-        if (enviar_ack):
-            ack = Mensaje_ack(mensaje.id,"ack")
-            data_string = pickle.dumps(ack)
-            clientsocket.send(data_string)
-            clientsocket.close()
+        clientsocket.close()
+        print("Se recibió el vídeo.")
 
-        if (numero_videos > 2):
-            print("Se recibió el vídeo completo")
-            numero_videos = 0
-
+        
 #------------------------------------------------------------------------------#
 
 def consola():

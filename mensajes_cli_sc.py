@@ -119,12 +119,13 @@ class Mensaje_enviar_video:
 	'''
 		Descripción:
 	'''
-	def __init__(self,ip,port,video,parte):
+	def __init__(self,ip,port,video,parte,nombre_video):
 		self.id             = 12
 		self.ip             = ip
 		self.port           = port
 		self.video          = video
 		self.parte          = parte
+		self.nombre_video   = nombre_video
 		self.type           = "sevidorD-cliente"
 
 #------------------------------------------------------------------------------#
