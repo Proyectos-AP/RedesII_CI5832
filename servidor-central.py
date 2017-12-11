@@ -69,6 +69,55 @@ def videos_cliente():
     print("- Los vídeos atendidos son:")
     print(videos_atendidos)
 
+#------------------------------------------------------------------------------#
+
+def verificar_sd(servidores_descarga):
+
+    '''
+        Descripción:
+    '''
+
+    lista_sd_activos = []
+
+    for servidor_sd in servidores_descarga:
+
+        activo = verificar_servidor_descarga(servidor_sd[0],servidor_sd[1])
+        print()
+
+        if (activo):
+            lista_sd_activos.append([servidor_sd[0],servidor_sd[1]])
+
+
+    return lista_sd_activos
+
+#------------------------------------------------------------------------------#
+
+def verificar_servidor_descarga(ip,port):
+
+    # Se crea el socket
+    sd_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Se obtiene el hostname de la maquina
+    ip = get_ip()
+    
+    try:
+        # Conectamos el socket
+        sd_socket.connect((ip, port))
+        sd_socket.settimeout(5)
+
+
+        # Se arma el mensaje que va a ser enviado al servidor.
+        mensaje = Mensaje_ack(20,"ping","probando_conexion")
+        data_string = pickle.dumps(mensaje)
+        sd_socket.send(data_string)
+
+        # Se cierra el socket
+        sd_socket.close()
+        return True
+
+    except:
+        sd_socket.close()
+        return False
 
 #------------------------------------------------------------------------------#
 
@@ -78,18 +127,23 @@ def enviar_video_cliente(ip,port,video):
         Descripción:
     '''
 
-    sd_server, sd_videos = random.choice(list(servidores_descarga.items()))
+    lista_sd_activos = verificar_sd(servidores_descarga)
 
-    mensaje_recibido, sd_socket = asignar_video_sd(sd_server[0],sd_server[1],ip,port,video,0)
+    if (len (lista_sd_activos) > 0):
+        
+        sd_server = random.choice(lista_sd_activos)
+        mensaje_recibido, sd_socket = asignar_video_sd(sd_server[0],sd_server[1],ip,port,video,0)
 
-    # Se recibe el ACK del Servidor de Descarga.
-    if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
+        # Se recibe el ACK del Servidor de Descarga.
+        if (mensaje_recibido.id == MENSAJE_ATENDER_VIDEO and mensaje_recibido.type == "ack"):
 
-        # Se espera a que el SD evíe el vídeo al cliente y envíe 
-        # su confirmación
-        #msg = sd_socket.recv(1024)
-        print("- Se le asignó el vídeo ",video,"al Servidor de Descarga",sd_server[0])
+            # Se espera a que el SD evíe el vídeo al cliente y envíe 
+            # su confirmación
+            #msg = sd_socket.recv(1024)
+            print("- Se le asignó el vídeo ",video,"al Servidor de Descarga",sd_server[0])
 
+    else:
+        print("- No hay Servidores de Descaga activos.")
 
 
 #------------------------------------------------------------------------------#
