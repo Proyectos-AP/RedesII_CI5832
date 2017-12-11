@@ -232,8 +232,12 @@ def escuchar_servidor_descarga():
         clientsocket,addr = serversocket.accept()
 
         # Se recibe la información enviada por los SD.      
-        data = clientsocket.recv(4096)
+        data = clientsocket.recv(8192)
         mensaje = pickle.loads(data)
+
+        ack = Mensaje_ack(mensaje.id,"ack")
+        data_string = pickle.dumps(ack)
+        clientsocket.send(data_string)
 
 
         if (mensaje.id  == MENSAJE_ENVIAR_VIDEO):

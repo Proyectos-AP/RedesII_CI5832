@@ -210,6 +210,8 @@ def atender_cliente(ip,port,video,parte):
     data_string = pickle.dumps(mensaje)
     sd_socket.sendall(data_string)
 
+    ack = sd_socket.recv(1024)
+
     # Se empieza a enviar el vídeo
     while (info_video):
         
