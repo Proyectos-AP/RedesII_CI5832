@@ -28,7 +28,6 @@ import sys
 #                            VARIABLES GLOBALES                                #
 #------------------------------------------------------------------------------#
 
-clientes                = {}
 videos_disponibles      = set()
 servidores_descarga     = {}
 videos_atendidos        = {}
@@ -157,11 +156,11 @@ def inscribir_sd(addr,videos):
     '''
         Descripción:
     '''
-
-
+    global servidores_descarga
     global videos_disponibles
 
     videos_disponibles = videos_disponibles.union(set(videos))
+    servidores_descarga[addr[0],addr[1]] = videos
 
     # Se crea el servidor de descarga en la BD
     nuevo_sd = modelo_db_sc.ServidorDescarga(direccion_ip=addr[0], 
@@ -180,7 +179,7 @@ def inscribir_sd(addr,videos):
     # for video in nuevo_sd.videos:
     #     print(video.nombre)
     print("VIDEOS DISPONIBLES",videos_disponibles)
-    print("Se ha inscrito el Servidor de descarga",servidores_descarga)
+    print("- Se ha inscrito el Servidor de descarga",nuevo_sd.direccion_ip, nuevo_sd.puerto)
 
 #------------------------------------------------------------------------------#
 

@@ -186,6 +186,7 @@ def enviar_info(ip_cliente,port_cliente,mensaje):
 
 #------------------------------------------------------------------------------#
 
+@db_session
 def atender_cliente(ip,port,video,parte):
 
     global mutex
